@@ -237,12 +237,12 @@ const OC_MAP={"USWPS":"var(--uswps)","PWr":"var(--pwr)","inne":"var(--other)"};
 const CAT={W:{label:"Wiedza — zna i rozumie",col:"var(--w)"},U:{label:"Umiejętności — potrafi",col:"var(--u)"},K:{label:"Kompetencje społeczne — jest gotów",col:"var(--k)"}};
 
 let db,currentUser=null,presenceRef=null;
-let S={courses:[],outcomes:[],history:[],openCourse:null,tab:"courses",fs:0,fo:"all",editCourse:null,editOc:null};
+let S={courses:[],outcomes:[],history:[],openCourse:null,tab:"courses",fs:0,fo:"all",editCourse:null,editOc:null,editTopic:null};
 let presenceUsers={};
 
 // ─── HELPERS ─────────────────────────────────────────────────────
 function toArr(v){if(!v)return[];if(Array.isArray(v))return v;if(typeof v==="object")return Object.values(v);return[]}
-function fixC(raw){return toArr(raw).map(c=>({...c,ct:toArr(c.ct),at:toArr(c.at),notes:c.notes||""}))}
+function fixC(raw){return toArr(raw).map(c=>({...c,ct:toArr(c.ct),at:toArr(c.at),notes:c.notes||"",lecW:c.lecW||"",lecC:c.lecC||""}))}
 function fixO(raw){return toArr(raw).map(o=>({...o,mp:toArr(o.mp),notes:o.notes||""}))}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 function who(){return currentUser?.displayName?.split(" ")[0]||"Anonim"}
@@ -290,13 +290,16 @@ function addH(w){S.history.unshift({who:who(),what:w,when:new Date().toLocaleStr
 function render(){
   const wt=S.courses.filter(c=>(c.ct||[]).length||(c.at||[]).length).length;
   document.getElementById("statusBar").innerHTML=`<span class="sync-dot"></span>Firebase · ${S.courses.length} przedm. · ${wt} z wątkami · ${S.outcomes.length} efektów`;
-  const tabs=[["courses","📚 Przedmioty"],["outcomes","🎯 Efekty uczenia"],["users","👥 Użytkownicy"],["log","📝 Historia"]];
+  const tabs=[["courses","📚 Przedmioty"],["outcomes","🎯 Efekty uczenia"],["matrix","📊 Matryca"],["users","👥 Użytkownicy"],["log","📝 Historia"]];
   document.getElementById("tabs").innerHTML=tabs.map(([id,l])=>`<button class="tab ${S.tab===id?"on":""}" onclick="S.tab='${id}';render()">${l}</button>`).join("");
   const el=document.getElementById("content");
   if(S.tab==="courses")el.innerHTML=rCourses();
   else if(S.tab==="outcomes")el.innerHTML=rOutcomes();
+  else if(S.tab==="matrix")el.innerHTML=rMatrix();
   else if(S.tab==="users")el.innerHTML=rUsers();
   else el.innerHTML=rLog();
+  // Auto-focus edit inputs
+  if(S.editTopic){const ef=document.querySelector(`[id^="editT-"]`);if(ef){ef.focus();ef.selectionStart=ef.value.length}}
 }
 
 function rCourses(){
@@ -320,6 +323,14 @@ function rCourses(){
           h+=`<div class="edit-row"><input class="inp" style="flex:2;min-width:180px" value="${esc(c.name)}" onchange="updCourse('${c.id}','name',this.value)"><select class="inp" onchange="updCourse('${c.id}','sem',+this.value)">`;
           for(let s=1;s<=7;s++)h+=`<option value="${s}" ${c.sem===s?"selected":""}>Sem. ${s}</option>`;
           h+=`</select><select class="inp" onchange="updCourse('${c.id}','owner',this.value)"><option ${c.owner==="USWPS"?"selected":""}>USWPS</option><option ${c.owner==="PWr"?"selected":""}>PWr</option><option value="inne" ${c.owner==="inne"?"selected":""}>inne</option></select></div>`;
+          h+=`<div class="edit-row"><label style="font-size:12px;color:var(--tx3)">Godziny:</label><input class="inp" type="number" style="width:70px" value="${c.h||0}" onchange="updCourse('${c.id}','h',+this.value)"></div>`;
+          h+=`<div class="edit-row"><label style="font-size:12px;color:var(--tx3);min-width:60px">Wykład:</label><input class="inp" style="flex:1" placeholder="Prowadzący wykład…" value="${esc(c.lecW||'')}" onchange="updCourse('${c.id}','lecW',this.value)"></div>`;
+          h+=`<div class="edit-row"><label style="font-size:12px;color:var(--tx3);min-width:60px">Ćwiczenia:</label><input class="inp" style="flex:1" placeholder="Prowadzący ćwiczenia…" value="${esc(c.lecC||'')}" onchange="updCourse('${c.id}','lecC',this.value)"></div>`;
+        } else if(c.lecW||c.lecC){
+          h+=`<div style="font-size:12px;color:var(--tx3);margin-bottom:6px;line-height:1.6">`;
+          if(c.lecW)h+=`<div>👤 <strong>Wykład:</strong> ${esc(c.lecW)}</div>`;
+          if(c.lecC)h+=`<div>👤 <strong>Ćwiczenia:</strong> ${esc(c.lecC)}</div>`;
+          h+=`</div>`;
         }
         // Notes
         h+=`<div class="note-label">📝 Notatki do przedmiotu</div>`;
@@ -344,7 +355,15 @@ function secB(c,key,cls,label,tc){
   h+=`<div id="add-${tc}-${c.id}" style="display:none" class="add-row"><input class="inp" style="flex:1" id="inp-${tc}-${c.id}" placeholder="Nowy wątek…" onkeydown="if(event.key==='Enter')doAdd('${c.id}','${tc}','${key}')"><button class="abtn ${cls}" onclick="doAdd('${c.id}','${tc}','${key}')">OK</button></div>`;
   if(!arr.length)h+=`<div class="empty-msg">Brak wątków – kliknij + Dodaj</div>`;
   const ds=cls==="classic"?"color:var(--tx4)":"color:var(--ai-dot)",ts=cls==="classic"?"color:var(--tx2)":"color:var(--ai-txt)",dc=cls==="classic"?"•":"◆";
-  arr.forEach((t,i)=>{h+=`<div class="topic"><span class="dot" style="${ds}">${dc}</span><span class="txt" style="${ts}">${esc(t)}</span><button class="rm" onclick="rmTopic('${c.id}','${key}',${i})">×</button></div>`});
+  const editKey=`${c.id}-${key}`;
+  arr.forEach((t,i)=>{
+    const isEditing=S.editTopic===editKey+"-"+i;
+    if(isEditing){
+      h+=`<div class="add-row" style="margin:2px 0"><input class="inp" style="flex:1" id="editT-${editKey}-${i}" value="${esc(t)}" onkeydown="if(event.key==='Enter')saveEditTopic('${c.id}','${key}',${i});if(event.key==='Escape'){S.editTopic=null;render()}"><button class="abtn ${cls}" onclick="saveEditTopic('${c.id}','${key}',${i})">✓</button><button class="abtn edit" onclick="S.editTopic=null;render()">✕</button></div>`;
+    } else {
+      h+=`<div class="topic"><span class="dot" style="${ds}">${dc}</span><span class="txt" style="${ts};cursor:pointer" onclick="S.editTopic='${editKey}-${i}';render()" title="Kliknij aby edytować">${esc(t)}</span><button class="rm" onclick="rmTopic('${c.id}','${key}',${i})">×</button></div>`;
+    }
+  });
   return h;
 }
 
@@ -372,6 +391,82 @@ function rOutcomes(){
     });
   }
   h+=rIO();return h;
+}
+
+function rMatrix(){
+  const cs=S.courses.sort((a,b)=>a.sem-b.sem);
+  const catOrder=["W","U","K"];
+  const ocs=S.outcomes.sort((a,b)=>{const ci=catOrder.indexOf(a.cat)-catOrder.indexOf(b.cat);return ci!==0?ci:a.code.localeCompare(b.code)});
+  if(!ocs.length)return`<div style="text-align:center;padding:40px;color:var(--tx3)">Brak efektów uczenia. Dodaj je w zakładce 🎯 Efekty uczenia.</div>`;
+
+  // Stats
+  const unmapped=ocs.filter(o=>!(o.mp||[]).length);
+  const totalMappings=ocs.reduce((s,o)=>(o.mp||[]).length+s,0);
+
+  let h=`<div style="font-size:15px;font-weight:600;color:var(--txH);margin-bottom:6px">Matryca pokrycia efektów uczenia przez przedmioty</div>`;
+  h+=`<div style="font-size:13px;color:var(--tx3);margin-bottom:14px">Kliknij komórkę, aby przypisać lub usunąć powiązanie. Kolory: <span style="color:var(--w)">■</span> Wiedza <span style="color:var(--u)">■</span> Umiejętności <span style="color:var(--k)">■</span> Kompetencje</div>`;
+
+  // Summary cards
+  h+=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">`;
+  h+=`<div style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius)"><div style="font-size:11px;color:var(--tx3)">Łączne przypisania</div><div style="font-size:24px;font-weight:700;color:var(--txH)">${totalMappings}</div></div>`;
+  h+=`<div style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius)"><div style="font-size:11px;color:var(--tx3)">Efekty bez przypisań</div><div style="font-size:24px;font-weight:700;color:${unmapped.length?'var(--red)':'var(--green)'}">${unmapped.length}</div></div>`;
+  h+=`<div style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius)"><div style="font-size:11px;color:var(--tx3)">Śr. efektów / przedmiot</div><div style="font-size:24px;font-weight:700;color:var(--txH)">${cs.length?(totalMappings/cs.length).toFixed(1):"–"}</div></div>`;
+  h+=`</div>`;
+
+  // Per-course coverage bar chart
+  h+=`<div style="font-size:13px;font-weight:600;color:var(--txH);margin-bottom:8px">Pokrycie efektów per przedmiot</div>`;
+  cs.forEach(c=>{
+    const cnt=ocs.filter(o=>(o.mp||[]).includes(c.id)).length;
+    const pct=ocs.length?Math.round(cnt/ocs.length*100):0;
+    const col=c.owner==="USWPS"?"var(--uswps)":c.owner==="PWr"?"var(--pwr)":"var(--other)";
+    const short=c.name.length>30?c.name.substring(0,28)+"…":c.name;
+    h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;font-size:12px">`;
+    h+=`<div style="width:200px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx2)" title="${esc(c.name)}"><span style="color:${col};font-weight:600">S${c.sem}</span> ${esc(short)}</div>`;
+    h+=`<div style="flex:1;height:18px;background:var(--bg);border-radius:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${col};border-radius:4px;transition:width .3s"></div></div>`;
+    h+=`<div style="width:50px;text-align:right;color:${pct>30?'var(--txH)':'var(--tx4)'};font-weight:${pct>30?600:400};font-family:'JetBrains Mono',monospace;font-size:11px">${cnt}/${ocs.length}</div>`;
+    h+=`</div>`;
+  });
+
+  // Matrix table
+  h+=`<div style="font-size:13px;font-weight:600;color:var(--txH);margin:20px 0 8px">Szczegółowa matryca</div>`;
+  h+=`<div style="overflow-x:auto;border:1px solid var(--bdr);border-radius:var(--radius)"><table style="border-collapse:collapse;font-size:11px;width:100%;min-width:${cs.length*32+80}px">`;
+  // Header
+  h+=`<thead><tr><th style="padding:6px 10px;text-align:left;color:var(--tx3);border-bottom:1px solid var(--bdr);position:sticky;left:0;background:var(--bg3);z-index:2;min-width:70px;font-size:11px">Efekt</th>`;
+  cs.forEach(c=>{
+    const col=c.owner==="USWPS"?"var(--uswps)":c.owner==="PWr"?"var(--pwr)":"var(--other)";
+    const short=c.name.replace(/Psychologia /g,"P. ").replace(/sztucznej inteligencji/g,"AI").replace(/Wprowadzenie do /g,"Wpr. ");
+    h+=`<th style="padding:4px 2px;text-align:center;border-bottom:1px solid var(--bdr);writing-mode:vertical-lr;transform:rotate(180deg);max-width:28px;font-size:9.5px;color:${col};font-weight:600;white-space:nowrap;height:120px" title="${esc(c.name)}">${esc(short.substring(0,22))}</th>`;
+  });
+  h+=`</tr></thead><tbody>`;
+
+  // Rows by category
+  let prevCat="";
+  ocs.forEach(o=>{
+    const catInfo=CAT[o.cat]||{col:"var(--tx)",label:""};
+    if(o.cat!==prevCat){
+      prevCat=o.cat;
+      h+=`<tr><td colspan="${cs.length+1}" style="padding:6px 10px;font-size:10px;font-weight:700;color:${catInfo.col};text-transform:uppercase;letter-spacing:.1em;background:var(--bg);border-bottom:1px solid var(--bdr)">${catInfo.label}</td></tr>`;
+    }
+    h+=`<tr>`;
+    h+=`<td style="padding:4px 10px;font-family:'JetBrains Mono',monospace;font-weight:600;color:${catInfo.col};border-bottom:1px solid var(--bdr);position:sticky;left:0;background:var(--bg3);z-index:1;font-size:11px" title="${esc(o.text)}">${esc(o.code)}</td>`;
+    cs.forEach(c=>{
+      const mapped=(o.mp||[]).includes(c.id);
+      h+=`<td onclick="togMap('${o.id}','${c.id}')" style="padding:3px;text-align:center;border-bottom:1px solid var(--bdr);cursor:pointer">`;
+      h+=`<div style="width:20px;height:20px;border-radius:4px;margin:0 auto;background:${mapped?catInfo.col:'var(--bg)'};opacity:${mapped?.85:.2};transition:all .15s;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--bg);font-weight:700">${mapped?"✓":""}</div>`;
+      h+=`</td>`;
+    });
+    h+=`</tr>`;
+  });
+  h+=`</tbody></table></div>`;
+
+  // Unmapped warnings
+  if(unmapped.length){
+    h+=`<div style="margin-top:16px;padding:14px 16px;background:var(--red)11;border:1px solid var(--red)33;border-radius:var(--radius)">`;
+    h+=`<div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px">⚠ Efekty bez przypisania do żadnego przedmiotu (${unmapped.length})</div>`;
+    unmapped.forEach(o=>{h+=`<div style="font-size:12px;color:var(--tx2);padding:2px 0"><strong style="color:${(CAT[o.cat]||{}).col||'var(--tx)'}">${esc(o.code)}</strong>: ${esc(o.text.substring(0,80))}…</div>`});
+    h+=`</div>`;
+  }
+  return h;
 }
 
 function rUsers(){
@@ -406,6 +501,7 @@ function rIO(){return`<div class="io-bar"><button class="io-btn" onclick="doExpo
 function toggleAdd(cid,t){const el=document.getElementById(`add-${t}-${cid}`);if(el){el.style.display=el.style.display==="none"?"flex":"none";if(el.style.display==="flex")el.querySelector("input").focus()}}
 function doAdd(cid,t,key){const inp=document.getElementById(`inp-${t}-${cid}`);if(!inp||!inp.value.trim())return;const c=S.courses.find(x=>x.id===cid);if(!c)return;if(!c[key])c[key]=[];c[key].push(inp.value.trim());addH(`+ ${key==="ct"?"klas.":"AI"} → „${c.name.substring(0,25)}…"`);save()}
 function rmTopic(cid,key,idx){const c=S.courses.find(x=>x.id===cid);if(!c||!c[key])return;c[key].splice(idx,1);addH(`− wątek z „${c.name.substring(0,25)}…"`);save()}
+function saveEditTopic(cid,key,idx){const inp=document.getElementById(`editT-${cid}-${key}-${idx}`);if(!inp)return;const c=S.courses.find(x=>x.id===cid);if(!c||!c[key])return;const old=c[key][idx];c[key][idx]=inp.value.trim();S.editTopic=null;if(old!==c[key][idx])addH(`✏️ Edycja wątku w „${c.name.substring(0,25)}…"`);save()}
 function updCourse(cid,field,val){const c=S.courses.find(x=>x.id===cid);if(!c)return;c[field]=val;if(field!=="notes")addH(`Edycja ${field} → „${String(val).substring(0,30)}…"`);save()}
 function delCourse(cid){const c=S.courses.find(x=>x.id===cid);if(!c||!confirm(`Usunąć „${c.name}"?`))return;S.courses=S.courses.filter(x=>x.id!==cid);S.openCourse=null;addH(`🗑 Usunięto „${c.name.substring(0,30)}"`);save()}
 function updOc(oid,field,val){const o=S.outcomes.find(x=>x.id===oid);if(!o)return;o[field]=val;if(field!=="notes")addH(`Edycja efektu ${o.code}: ${field}`);save()}
