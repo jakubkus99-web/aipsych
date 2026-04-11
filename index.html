@@ -11,128 +11,117 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-/* ── DARK THEME (default) ── */
 :root{--bg:#090b10;--bg2:#0d1018;--bg3:#121620;--bg4:#171c2a;--bdr:#1a1f30;--bdr2:#252e45;
   --tx:#d0d5e0;--tx2:#8b92a5;--tx3:#5a6278;--tx4:#363d50;--txH:#f0f2f8;
   --uswps:#e8854f;--pwr:#54a5e8;--other:#777;--acc:#e8854f;
   --w:#6cb4d9;--u:#a87dd4;--k:#6dd4a8;--red:#d45454;--green:#54d48a;
   --radius:10px;--hdr-bg:linear-gradient(180deg,#0e1220,#0b0e16);
-  --abtn-c-bg:#14202e;--abtn-a-bg:#2a1c14;--tab-on-bg:#161d30;
-  --topic-bdr:rgba(255,255,255,.02);--topic-ai-dot:#6a4a38;--topic-ai-txt:#c09570;
-  --inp-col:#e4e8f0;--google-shadow:rgba(0,0,0,.2);--chip-off-bg:var(--bg)}
-/* ── LIGHT THEME ── */
-html.light{--bg:#f4f5f8;--bg2:#ffffff;--bg3:#f0f1f5;--bg4:#e8eaef;--bdr:#dcdfe6;--bdr2:#c5c9d4;
+  --abtn-c:#14202e;--abtn-a:#2a1c14;--tab-on:#161d30;
+  --topic-bdr:rgba(255,255,255,.02);--ai-dot:#6a4a38;--ai-txt:#c09570;
+  --inp-col:#e4e8f0;--chip-off:var(--bg);--note-bg:#0f1318}
+html.light{--bg:#f4f5f8;--bg2:#fff;--bg3:#f0f1f5;--bg4:#e8eaef;--bdr:#dcdfe6;--bdr2:#c5c9d4;
   --tx:#2a2e38;--tx2:#4a5068;--tx3:#6b7188;--tx4:#a0a6b8;--txH:#1a1d26;
   --uswps:#d06a35;--pwr:#3080c8;--other:#888;--acc:#d06a35;
   --w:#2a7fa8;--u:#7b52b0;--k:#2a9e6e;--red:#c43a3a;--green:#2a9e5a;
-  --hdr-bg:linear-gradient(180deg,#ffffff,#f8f9fb);
-  --abtn-c-bg:#e0eef6;--abtn-a-bg:#f6e8dd;--tab-on-bg:#eaecf2;
-  --topic-bdr:rgba(0,0,0,.04);--topic-ai-dot:#b07040;--topic-ai-txt:#8a5a30;
-  --inp-col:#1a1d26;--google-shadow:rgba(0,0,0,.08);--chip-off-bg:var(--bg3)}
-html{font-size:16px}body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
-button{font-family:inherit;cursor:pointer;border:none;transition:all .15s}input,textarea,select{font-family:inherit;outline:none}
-::selection{background:var(--acc);color:white}
+  --hdr-bg:linear-gradient(180deg,#fff,#f8f9fb);
+  --abtn-c:#e0eef6;--abtn-a:#f6e8dd;--tab-on:#eaecf2;
+  --topic-bdr:rgba(0,0,0,.04);--ai-dot:#b07040;--ai-txt:#8a5a30;
+  --inp-col:#1a1d26;--chip-off:var(--bg3);--note-bg:#f8f8fa}
+html{font-size:17px}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+button{font-family:inherit;cursor:pointer;border:none;transition:all .15s}
+input,textarea,select{font-family:inherit;outline:none}
+::selection{background:var(--acc);color:#fff}
 
-/* LOGIN */
 .login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.login-box{max-width:440px;width:100%;background:var(--bg3);border-radius:16px;border:1px solid var(--bdr2);padding:44px 36px;text-align:center}
-.login-box .logo{width:56px;height:56px;border-radius:15px;background:linear-gradient(135deg,var(--uswps),var(--pwr));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:white;margin:0 auto 18px;box-shadow:0 4px 20px rgba(232,133,79,.25)}
-.login-box h1{font-size:24px;color:var(--txH);margin-bottom:4px;letter-spacing:-.03em}
-.login-box .sub{font-size:13px;color:var(--tx3);margin-bottom:30px;line-height:1.5}
-.google-btn{display:inline-flex;align-items:center;gap:10px;padding:13px 30px;border-radius:10px;background:#fff;color:#333;font-weight:600;font-size:15px;box-shadow:0 2px 8px var(--google-shadow);transition:all .15s}
-.google-btn:hover{box-shadow:0 4px 16px var(--google-shadow);transform:translateY(-1px)}
-.google-btn svg{width:20px;height:20px}
-.login-error{color:var(--red);font-size:13px;margin-top:12px}
+.login-box{max-width:460px;width:100%;background:var(--bg3);border-radius:16px;border:1px solid var(--bdr2);padding:48px 38px;text-align:center}
+.login-box .logo{width:58px;height:58px;border-radius:15px;background:linear-gradient(135deg,var(--uswps),var(--pwr));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:21px;color:#fff;margin:0 auto 20px;box-shadow:0 4px 20px rgba(232,133,79,.25)}
+.login-box h1{font-size:26px;color:var(--txH);margin-bottom:5px;letter-spacing:-.03em}
+.login-box .sub{font-size:14px;color:var(--tx3);margin-bottom:32px;line-height:1.5}
+.google-btn{display:inline-flex;align-items:center;gap:10px;padding:14px 32px;border-radius:10px;background:#fff;color:#333;font-weight:600;font-size:16px;box-shadow:0 2px 10px rgba(0,0,0,.15);transition:all .15s}
+.google-btn:hover{box-shadow:0 4px 16px rgba(0,0,0,.2);transform:translateY(-1px)}
+.google-btn svg{width:22px;height:22px}
+.login-error{color:var(--red);font-size:13px;margin-top:14px}
 
-/* HEADER */
 .hdr{background:var(--hdr-bg);border-bottom:1px solid var(--bdr);padding:16px 22px 12px;position:sticky;top:0;z-index:100;transition:background .3s}
-.hdr-row{display:flex;align-items:center;gap:14px;margin-bottom:6px}
-.hdr .logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--uswps),var(--pwr));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:white;flex-shrink:0}
-.hdr h1{font-size:18px;font-weight:700;color:var(--txH);letter-spacing:-.03em}
-.hdr .sub{font-size:11.5px;color:var(--tx3);margin-top:1px}
-.sync-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;vertical-align:middle;background:var(--green);box-shadow:0 0 6px rgba(84,212,138,.4)}
+.hdr-row{display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+.hdr .logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--uswps),var(--pwr));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0}
+.hdr h1{font-size:19px;font-weight:700;color:var(--txH);letter-spacing:-.03em}
+.hdr .sub{font-size:12px;color:var(--tx3);margin-top:1px}
+.sync-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle;background:var(--green);box-shadow:0 0 6px rgba(84,212,138,.4)}
 .user-pill{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:20px;background:var(--bg2);border:1px solid var(--bdr)}
 .user-pill img{width:28px;height:28px;border-radius:50%}
 .user-pill span{font-size:12px;color:var(--tx2);font-weight:500;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.theme-btn{background:var(--bg2);border:1px solid var(--bdr);color:var(--tx3);font-size:16px;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.theme-btn:hover{border-color:var(--acc);color:var(--acc)}
-.logout-btn{background:none;color:var(--tx4);font-size:11px;padding:4px 8px;border-radius:5px}
-.logout-btn:hover{color:var(--red)}
+.icon-btn{background:var(--bg2);border:1px solid var(--bdr);color:var(--tx3);font-size:16px;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.icon-btn:hover{border-color:var(--acc);color:var(--acc)}
+.logout-btn{background:none;color:var(--tx4);font-size:12px;padding:4px 10px;border-radius:5px}.logout-btn:hover{color:var(--red)}
 .tabs{display:flex;gap:4px;margin-top:10px}
 .tab{flex:1;padding:10px 6px;border-radius:9px;background:transparent;color:var(--tx3);font-weight:600;font-size:13px;transition:all .2s}
-.tab:hover{color:var(--tx2)}.tab.on{background:var(--tab-on-bg);color:var(--acc)}
+.tab:hover{color:var(--tx2)}.tab.on{background:var(--tab-on);color:var(--acc)}
 
-/* CONTENT */
-.content{padding:14px 22px 40px;max-height:calc(100vh - 132px);overflow-y:auto;scroll-behavior:smooth}
+.content{padding:16px 22px 40px;max-height:calc(100vh - 136px);overflow-y:auto;scroll-behavior:smooth}
 .content::-webkit-scrollbar{width:5px}.content::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px}
 
-/* FILTERS */
 .filters{display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap}
 .fbtn{padding:7px 14px;border-radius:7px;background:var(--bg2);color:var(--tx3);font-weight:600;font-size:13px;border:1px solid var(--bdr)}.fbtn:hover{color:var(--tx2);border-color:var(--bdr2)}.fbtn.on{background:var(--bdr2);color:var(--acc);border-color:var(--bdr2)}.fbtn.own.on{color:var(--txH)}
-
 .sem-label{font-size:11px;font-weight:700;color:var(--tx4);text-transform:uppercase;letter-spacing:.12em;padding:16px 2px 7px}
 
-/* CARDS */
 .card{margin-bottom:6px;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--bdr);overflow:hidden;transition:all .2s}
 .card.open{background:var(--bg3);border-color:var(--bdr2)}
 .card-hdr{padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:11px;user-select:none}
 .card-bar{width:4px;height:30px;border-radius:2px;flex-shrink:0}
-.card-title{font-weight:600;font-size:15px;color:var(--txH);letter-spacing:-.01em}
-.card-meta{font-size:11.5px;color:var(--tx3);margin-top:2px}
-.badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700}
+.card-title{font-weight:600;font-size:16px;color:var(--txH);letter-spacing:-.01em}
+.card-meta{font-size:12px;color:var(--tx3);margin-top:2px}
+.badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:10.5px;font-weight:700}
 .chevron{color:var(--tx4);font-size:16px;transition:transform .25s}.card.open .chevron{transform:rotate(180deg)}
 .card-body{padding:0 16px 16px}
 
-/* TOPICS */
-.sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;margin-top:6px}
+.sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;margin-top:8px}
 .sec-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}.sec-label.classic{color:var(--w)}.sec-label.ai{color:var(--acc)}
 .abtn{padding:6px 14px;border-radius:6px;font-weight:600;font-size:12px}
-.abtn.classic{background:var(--abtn-c-bg);color:var(--w)}.abtn.ai{background:var(--abtn-a-bg);color:var(--acc)}
+.abtn.classic{background:var(--abtn-c);color:var(--w)}.abtn.ai{background:var(--abtn-a);color:var(--acc)}
+.abtn.edit{background:var(--bg4);color:var(--tx2)}.abtn.del{background:none;color:var(--red);opacity:.6}.abtn.del:hover{opacity:1}
 .add-row{display:flex;gap:6px;margin-bottom:8px}
-.inp{padding:9px 12px;border:1px solid var(--bdr2);border-radius:7px;background:var(--bg);color:var(--inp-col);font-size:14px;transition:border-color .2s}.inp:focus{border-color:var(--acc)}
-.topic{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:14px;line-height:1.55;border-bottom:1px solid var(--topic-bdr)}.topic:last-child{border-bottom:none}
+.inp{padding:9px 12px;border:1px solid var(--bdr2);border-radius:7px;background:var(--bg);color:var(--inp-col);font-size:14px;transition:border-color .2s;width:100%;box-sizing:border-box}.inp:focus{border-color:var(--acc)}
+select.inp{width:auto}
+.topic{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:14.5px;line-height:1.55;border-bottom:1px solid var(--topic-bdr)}.topic:last-child{border-bottom:none}
 .topic .dot{flex-shrink:0;margin-top:4px;font-size:11px}.topic .txt{flex:1}
 .topic .rm{background:none;color:var(--tx4);font-size:16px;padding:0 2px;line-height:1;opacity:0;transition:all .15s}.topic:hover .rm{opacity:1}.topic .rm:hover{color:var(--red)}
-.empty-msg{font-size:13px;color:var(--tx4);font-style:italic;padding:6px 0}
+.empty-msg{font-size:13.5px;color:var(--tx4);font-style:italic;padding:6px 0}
+.note-area{margin-top:8px;padding:8px 10px;background:var(--note-bg);border:1px solid var(--bdr);border-radius:7px;font-size:13px;color:var(--tx2);resize:vertical;min-height:36px;width:100%;box-sizing:border-box;transition:border-color .2s}
+.note-area:focus{border-color:var(--acc)}
+.note-label{font-size:10px;color:var(--tx4);margin-top:10px;margin-bottom:3px}
 
-/* OUTCOMES */
 .cat-header{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:18px 0 9px;display:flex;align-items:center;gap:8px}
 .cat-header::after{content:'';flex:1;height:1px;background:var(--bdr)}
-.oc-card{padding:13px 16px;background:var(--bg2);border-radius:var(--radius);margin-bottom:5px;border:1px solid var(--bdr);transition:border-color .15s}.oc-card:hover{border-color:var(--bdr2)}
+.oc-card{padding:14px 16px;background:var(--bg2);border-radius:var(--radius);margin-bottom:5px;border:1px solid var(--bdr);transition:border-color .15s}.oc-card:hover{border-color:var(--bdr2)}
 .oc-hdr{display:flex;gap:8px;align-items:flex-start}
-.oc-code{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:12.5px;flex-shrink:0;padding:2px 7px;border-radius:4px}
-.oc-txt{flex:1;font-size:14px;color:var(--tx2);line-height:1.55}
+.oc-code{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13px;flex-shrink:0;padding:2px 7px;border-radius:4px}
+.oc-txt{flex:1;font-size:14.5px;color:var(--tx2);line-height:1.55}
 .chips{margin-top:8px;display:flex;flex-wrap:wrap;gap:3px}
-.chip{padding:3px 8px;border-radius:4px;font-size:10px;cursor:pointer;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:all .15s;font-weight:500}.chip:hover{filter:brightness(1.2)}
+.chip{padding:3px 8px;border-radius:4px;font-size:10.5px;cursor:pointer;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:all .15s;font-weight:500}.chip:hover{filter:brightness(1.2)}
 
-/* LOG */
-.log-row{padding:9px 13px;border-radius:7px;margin-bottom:3px;font-size:13px;display:flex;gap:10px}
+.log-row{padding:9px 14px;border-radius:7px;margin-bottom:3px;font-size:13px;display:flex;gap:10px}
 .log-row:nth-child(odd){background:var(--bg2)}.log-row:nth-child(even){background:var(--bg3)}
-.log-who{color:var(--acc);font-weight:600;flex-shrink:0;min-width:70px;font-size:12px}.log-what{flex:1;color:var(--tx2)}.log-when{color:var(--tx4);font-size:10.5px;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+.log-who{color:var(--acc);font-weight:600;flex-shrink:0;min-width:75px;font-size:12.5px}.log-what{flex:1;color:var(--tx2)}.log-when{color:var(--tx4);font-size:11px;flex-shrink:0;font-family:'JetBrains Mono',monospace}
 
-/* IO */
+.presence-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.presence-pill{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:16px;background:var(--bg2);border:1px solid var(--bdr);font-size:12px;color:var(--tx2)}
+.presence-pill img{width:22px;height:22px;border-radius:50%}
+.presence-pill .online-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+
 .io-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--bdr)}
 .io-btn{padding:9px 18px;border:1px solid var(--bdr2);border-radius:8px;background:var(--bg3);color:var(--tx2);font-weight:600;font-size:13px;transition:all .15s}
-.io-btn:hover{border-color:var(--acc);color:var(--acc)}.io-btn.danger{border-color:var(--red);color:var(--red);opacity:.6}.io-btn.danger:hover{opacity:1}
-
-.stats{margin-top:18px;padding:13px 18px;background:var(--bg2);border-radius:var(--radius);display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--tx3);border:1px solid var(--bdr)}
+.io-btn:hover{border-color:var(--acc);color:var(--acc)}.io-btn.danger{border-color:var(--red);color:var(--red);opacity:.5}.io-btn.danger:hover{opacity:1}
+.stats{margin-top:18px;padding:14px 18px;background:var(--bg2);border-radius:var(--radius);display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--tx3);border:1px solid var(--bdr)}
 .stats strong{color:var(--txH)}
+.edit-row{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap;align-items:center}
 .hidden{display:none}
 @media(max-width:500px){.content{padding:10px 14px}.hdr{padding:14px 16px 10px}html{font-size:15px}}
 </style>
 </head>
 <body>
-
-<!-- ============================================================
-  KONFIGURACJA — WYPEŁNIJ PONIŻEJ SWOIMI DANYMI Z FIREBASE
-  Potem wrzuć ten plik jako index.html na GitHub Pages.
-  Współpracownicy otwierają link i logują się przez Google.
-============================================================ -->
 <script>
-// ╔═══════════════════════════════════════════════════════════╗
-// ║  WKLEJ TUTAJ SWÓJ FIREBASE CONFIG Z KONSOLI FIREBASE     ║
-// ║  (Project settings → General → Your apps → Web)           ║
-// ╚═══════════════════════════════════════════════════════════╝
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDiWK8kmhWU0po1s1-WkReIgIHR1wFptws",
   authDomain: "curriculum-wb.firebaseapp.com",
@@ -144,7 +133,6 @@ const FIREBASE_CONFIG = {
 };
 </script>
 
-<!-- LOGIN SCREEN -->
 <div id="loginScreen" class="login-screen">
   <div class="login-box">
     <div class="logo">AI</div>
@@ -155,18 +143,17 @@ const FIREBASE_CONFIG = {
       Zaloguj się przez Google
     </button>
     <div id="loginError" class="login-error"></div>
-    <div style="margin-top:20px"><button class="theme-btn" onclick="toggleTheme()" id="themeBtn2" style="margin:0 auto">🌙</button></div>
+    <div style="margin-top:22px"><button class="icon-btn" onclick="toggleTheme()">🌙</button></div>
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div id="mainApp" class="hidden">
   <div class="hdr">
     <div class="hdr-row">
       <div class="logo">AI</div>
       <div style="flex:1"><h1>Curriculum Workbench</h1><div class="sub" id="statusBar"><span class="sync-dot"></span>Połączono</div></div>
       <div class="user-pill"><img id="userPhoto" src="" alt=""><span id="userDisplayName"></span></div>
-      <button class="theme-btn" onclick="toggleTheme()" title="Tryb jasny/ciemny" id="themeBtn">🌙</button>
+      <button class="icon-btn" onclick="toggleTheme()" title="Tryb jasny/ciemny">🌙</button>
       <button class="logout-btn" onclick="doLogout()">Wyloguj</button>
     </div>
     <div class="tabs" id="tabs"></div>
@@ -175,95 +162,101 @@ const FIREBASE_CONFIG = {
 </div>
 
 <script>
-// ─── DATA ────────────────────────────────────────────────────────
-const INIT_OUTCOMES = [
-  {id:"W01",code:"W01",cat:"W",text:"Zna i rozumie rolę interdyscyplinarnej wiedzy integrującej informatykę techniczną i psychologię w rozwiązywaniu złożonych problemów związanych z projektowaniem i wdrażaniem systemów AI.",mp:[]},
-  {id:"W02",code:"W02",cat:"W",text:"Zna i rozumie podstawy matematyki wyższej obejmujące zagadnienia analizy, algebry, metod probabilistycznych i statystyki.",mp:[]},
-  {id:"W03",code:"W03",cat:"W",text:"Zna i rozumie narzędzia służące do projektowania głębokich sieci neuronowych.",mp:[]},
-  {id:"W04",code:"W04",cat:"W",text:"Zna i rozumie składnię nowoczesnych języków programowania, kluczowe struktury danych oraz techniki konstrukcji i analizy algorytmów.",mp:[]},
-  {id:"W05",code:"W05",cat:"W",text:"Zna i rozumie kluczowe metody zbierania, przetwarzania, analizy i wizualizacji danych.",mp:[]},
-  {id:"W06",code:"W06",cat:"W",text:"Zna i rozumie narzędzia inżynierii oprogramowania służące do analizy, projektowania, wytwarzania, testowania i utrzymania oprogramowania.",mp:[]},
-  {id:"W07",code:"W07",cat:"W",text:"Zna i rozumie podstawowe i wybrane zaawansowane narzędzia i techniki uczenia maszynowego.",mp:[]},
-  {id:"W08",code:"W08",cat:"W",text:"Zna i rozumie zasady budowania i analizy sieci złożonych.",mp:[]},
-  {id:"W09",code:"W09",cat:"W",text:"Zna i rozumie problematykę funkcjonowania człowieka w otoczeniu społecznym, teorie wyjaśniające i sposoby prowadzenia badań w psychologii społecznej.",mp:[]},
-  {id:"W10",code:"W10",cat:"W",text:"Zna i rozumie pojęcie emocji i motywacji oraz teorie wyjaśniające w tym zakresie i sposoby badania tych zjawisk.",mp:[]},
-  {id:"W11",code:"W11",cat:"W",text:"Zna i rozumie pojęcie procesów poznawczych oraz teorie wyjaśniające i sposoby badania tych zjawisk.",mp:[]},
-  {id:"W12",code:"W12",cat:"W",text:"Zna i rozumie pojęcia osobowości oraz różnic indywidualnych, ich rolę w wyjaśnianiu zachowań człowieka oraz sposoby ich badania.",mp:[]},
-  {id:"W13",code:"W13",cat:"W",text:"Zna i rozumie zasady stosowania wiedzy psychologicznej do diagnozy potrzeb użytkowników oraz modelowania ich charakterystyki i przewidywania zachowań w celu optymalizacji systemów AI.",mp:[]},
-  {id:"W14",code:"W14",cat:"W",text:"Zna i rozumie fundamentalne dylematy współczesnego świata związane z rozwojem AI, w tym zagrożenia i szanse dla podmiotowości człowieka, prywatności, dobrostanu psychicznego oraz relacji społecznych.",mp:[]},
-  {id:"W15",code:"W15",cat:"W",text:"Zna i rozumie podstawowe uwarunkowania ekonomiczne, prawne i etyczne działalności zawodowej związanej z AI, w tym ochronę własności intelektualnej.",mp:[]},
-  {id:"W16",code:"W16",cat:"W",text:"Zna i rozumie zasady tworzenia i rozwijania różnych form przedsiębiorczości w ramach projektowania i wdrażania systemów AI.",mp:[]},
-  {id:"U01",code:"U01",cat:"U",text:"Potrafi rozwiązywać złożone problemy oraz wykonywać zadania projektowe w warunkach niepewności, integrując wiedzę informatyki technicznej i psychologii.",mp:[]},
-  {id:"U02",code:"U02",cat:"U",text:"Potrafi zaprojektować, zrealizować oraz zweryfikować rozwiązanie oparte na AI, zapewniając poprawność techniczną oraz dopasowanie do potrzeb użytkownika.",mp:[]},
-  {id:"U03",code:"U03",cat:"U",text:"Potrafi wyszukiwać, weryfikować, selekcjonować informacje z informatyki i psychologii oraz analizować i syntetyzować je w sposób krytyczny.",mp:[]},
-  {id:"U04",code:"U04",cat:"U",text:"Potrafi stosować wiedzę z matematyki wyższej, w tym przeprowadzać formalne i poprawne rozumowania.",mp:[]},
-  {id:"U05",code:"U05",cat:"U",text:"Potrafi analizować i rozwiązywać problemy związane z analizą danych.",mp:[]},
-  {id:"U06",code:"U06",cat:"U",text:"Potrafi programować we współczesnych językach programowania.",mp:[]},
-  {id:"U07",code:"U07",cat:"U",text:"Potrafi dbać o bezpieczeństwo danych w obszarze sztucznej inteligencji.",mp:[]},
-  {id:"U08",code:"U08",cat:"U",text:"Potrafi budować sieci złożone, dokonywać ich analizy, prowadzić symulacje i interpretować wyniki.",mp:[]},
-  {id:"U09",code:"U09",cat:"U",text:"Potrafi zaprojektować infrastrukturę niezbędną do uruchomienia systemu AI i uruchomić na niej system.",mp:[]},
-  {id:"U10",code:"U10",cat:"U",text:"Potrafi konstruować oraz analizować zaawansowane algorytmy sztucznej inteligencji.",mp:[]},
-  {id:"U11",code:"U11",cat:"U",text:"Potrafi tworzyć podstawowe modele z zakresu uczenia maszynowego i sztucznej inteligencji.",mp:[]},
-  {id:"U12",code:"U12",cat:"U",text:"Potrafi tworzyć dokumentację techniczną i użytkownika dla opracowanego oprogramowania.",mp:[]},
-  {id:"U13",code:"U13",cat:"U",text:"Potrafi opisywać, uzasadniać i wyjaśniać zachowania człowieka, wykorzystując wiedzę z zakresu psychologii.",mp:[]},
-  {id:"U14",code:"U14",cat:"U",text:"Potrafi wykorzystać teorie psychologiczne do modelowania charakterystyki użytkownika oraz przewidywania jego zachowań w celu optymalizacji systemów AI.",mp:[]},
-  {id:"U15",code:"U15",cat:"U",text:"Potrafi wykorzystać metody badawcze psychologii do diagnozowania potrzeb użytkowników oraz projektowania i ewaluacji systemów AI.",mp:[]},
-  {id:"U16",code:"U16",cat:"U",text:"Potrafi prowadzić komunikację z interesariuszami, posługując się terminologią właściwą dla informatyki technicznej i psychologii.",mp:[]},
-  {id:"U17",code:"U17",cat:"U",text:"Potrafi brać udział w debacie dotyczącej rozwiązań AI, prezentując i oceniając różne stanowiska.",mp:[]},
-  {id:"U18",code:"U18",cat:"U",text:"Potrafi posługiwać się językiem obcym na poziomie B2 ESOKJ.",mp:[]},
-  {id:"U19",code:"U19",cat:"U",text:"Potrafi planować i organizować pracę indywidualną oraz zespołową w grupach interdyscyplinarnych realizujących projekty AI.",mp:[]},
-  {id:"U20",code:"U20",cat:"U",text:"Potrafi planować i realizować rozwój zawodowy i osobisty, wcielając ideę kształcenia ustawicznego.",mp:[]},
-  {id:"K01",code:"K01",cat:"K",text:"Jest gotów do krytycznej oceny posiadanej wiedzy z informatyki i psychologii, będąc świadomym konieczności jej poszerzania i aktualizowania.",mp:[]},
-  {id:"K02",code:"K02",cat:"K",text:"Jest gotów do krytycznej oceny możliwości i ograniczeń AI w obszarach wymagających empatii, etyki oraz rozumienia psychospołecznych uwarunkowań.",mp:[]},
-  {id:"K03",code:"K03",cat:"K",text:"Jest gotów do zasięgania opinii ekspertów przy trudnościach z samodzielnym rozwiązaniem problemu związanego z AI.",mp:[]},
-  {id:"K04",code:"K04",cat:"K",text:"Jest gotów do inicjowania projektów społecznych na rzecz poprawy jakości życia z zastosowaniem nowych technologii.",mp:[]},
-  {id:"K05",code:"K05",cat:"K",text:"Jest gotów do myślenia i działania w sposób przedsiębiorczy, dążąc do tworzenia innowacyjnych rozwiązań AI.",mp:[]},
-  {id:"K06",code:"K06",cat:"K",text:"Jest gotów do brania etycznej odpowiedzialności za projektowane systemy AI, ze szczególnym uwzględnieniem dobrostanu, prywatności i autonomii.",mp:[]},
-  {id:"K07",code:"K07",cat:"K",text:"Jest gotów do odpowiedzialnego pełnienia ról zawodowych, dbając o dorobek i tradycje zawodu inżyniera.",mp:[]},
-  {id:"K08",code:"K08",cat:"K",text:"Ma świadomość ważności systematycznej aktywności fizycznej dla zdrowia fizycznego i psychicznego.",mp:[]}
+// ─── INIT DATA ───────────────────────────────────────────────────
+const INIT_OUTCOMES=[
+{id:"W01",code:"W01",cat:"W",text:"Zna i rozumie rolę interdyscyplinarnej wiedzy integrującej informatykę techniczną i psychologię w rozwiązywaniu złożonych problemów związanych z projektowaniem i wdrażaniem systemów AI.",mp:[],notes:""},
+{id:"W02",code:"W02",cat:"W",text:"Zna i rozumie podstawy matematyki wyższej obejmujące zagadnienia analizy, algebry, metod probabilistycznych i statystyki.",mp:[],notes:""},
+{id:"W03",code:"W03",cat:"W",text:"Zna i rozumie narzędzia służące do projektowania głębokich sieci neuronowych.",mp:[],notes:""},
+{id:"W04",code:"W04",cat:"W",text:"Zna i rozumie składnię nowoczesnych języków programowania, kluczowe struktury danych oraz techniki konstrukcji i analizy algorytmów.",mp:[],notes:""},
+{id:"W05",code:"W05",cat:"W",text:"Zna i rozumie kluczowe metody zbierania, przetwarzania, analizy i wizualizacji danych.",mp:[],notes:""},
+{id:"W06",code:"W06",cat:"W",text:"Zna i rozumie narzędzia inżynierii oprogramowania służące do analizy, projektowania, wytwarzania, testowania i utrzymania oprogramowania.",mp:[],notes:""},
+{id:"W07",code:"W07",cat:"W",text:"Zna i rozumie podstawowe i wybrane zaawansowane narzędzia i techniki uczenia maszynowego.",mp:[],notes:""},
+{id:"W08",code:"W08",cat:"W",text:"Zna i rozumie zasady budowania i analizy sieci złożonych.",mp:[],notes:""},
+{id:"W09",code:"W09",cat:"W",text:"Zna i rozumie problematykę funkcjonowania człowieka w otoczeniu społecznym, teorie wyjaśniające i sposoby prowadzenia badań w psychologii społecznej.",mp:[],notes:""},
+{id:"W10",code:"W10",cat:"W",text:"Zna i rozumie pojęcie emocji i motywacji oraz teorie wyjaśniające i sposoby badania tych zjawisk.",mp:[],notes:""},
+{id:"W11",code:"W11",cat:"W",text:"Zna i rozumie pojęcie procesów poznawczych oraz teorie wyjaśniające i sposoby badania tych zjawisk.",mp:[],notes:""},
+{id:"W12",code:"W12",cat:"W",text:"Zna i rozumie pojęcia osobowości oraz różnic indywidualnych, ich rolę w wyjaśnianiu zachowań człowieka oraz sposoby ich badania.",mp:[],notes:""},
+{id:"W13",code:"W13",cat:"W",text:"Zna i rozumie zasady stosowania wiedzy psychologicznej do diagnozy potrzeb użytkowników oraz modelowania ich charakterystyki i przewidywania zachowań w celu optymalizacji systemów AI.",mp:[],notes:""},
+{id:"W14",code:"W14",cat:"W",text:"Zna i rozumie fundamentalne dylematy współczesnego świata związane z rozwojem AI, w tym zagrożenia i szanse dla podmiotowości człowieka, prywatności, dobrostanu psychicznego oraz relacji społecznych.",mp:[],notes:""},
+{id:"W15",code:"W15",cat:"W",text:"Zna i rozumie podstawowe uwarunkowania ekonomiczne, prawne i etyczne działalności zawodowej związanej z AI, w tym ochronę własności intelektualnej.",mp:[],notes:""},
+{id:"W16",code:"W16",cat:"W",text:"Zna i rozumie zasady tworzenia i rozwijania różnych form przedsiębiorczości w ramach projektowania i wdrażania systemów AI.",mp:[],notes:""},
+{id:"U01",code:"U01",cat:"U",text:"Potrafi rozwiązywać złożone problemy oraz wykonywać zadania projektowe w warunkach niepewności, integrując wiedzę informatyki technicznej i psychologii.",mp:[],notes:""},
+{id:"U02",code:"U02",cat:"U",text:"Potrafi zaprojektować, zrealizować oraz zweryfikować rozwiązanie oparte na AI, zapewniając poprawność techniczną oraz dopasowanie do potrzeb użytkownika.",mp:[],notes:""},
+{id:"U03",code:"U03",cat:"U",text:"Potrafi wyszukiwać, weryfikować, selekcjonować informacje z informatyki i psychologii oraz analizować i syntetyzować je w sposób krytyczny.",mp:[],notes:""},
+{id:"U04",code:"U04",cat:"U",text:"Potrafi stosować wiedzę z matematyki wyższej, w tym przeprowadzać formalne i poprawne rozumowania.",mp:[],notes:""},
+{id:"U05",code:"U05",cat:"U",text:"Potrafi analizować i rozwiązywać problemy związane z analizą danych.",mp:[],notes:""},
+{id:"U06",code:"U06",cat:"U",text:"Potrafi programować we współczesnych językach programowania.",mp:[],notes:""},
+{id:"U07",code:"U07",cat:"U",text:"Potrafi dbać o bezpieczeństwo danych w obszarze sztucznej inteligencji.",mp:[],notes:""},
+{id:"U08",code:"U08",cat:"U",text:"Potrafi budować sieci złożone, dokonywać ich analizy, prowadzić symulacje i interpretować wyniki.",mp:[],notes:""},
+{id:"U09",code:"U09",cat:"U",text:"Potrafi zaprojektować infrastrukturę niezbędną do uruchomienia systemu AI.",mp:[],notes:""},
+{id:"U10",code:"U10",cat:"U",text:"Potrafi konstruować oraz analizować zaawansowane algorytmy sztucznej inteligencji.",mp:[],notes:""},
+{id:"U11",code:"U11",cat:"U",text:"Potrafi tworzyć podstawowe modele z zakresu uczenia maszynowego i sztucznej inteligencji.",mp:[],notes:""},
+{id:"U12",code:"U12",cat:"U",text:"Potrafi tworzyć dokumentację techniczną i użytkownika dla opracowanego oprogramowania.",mp:[],notes:""},
+{id:"U13",code:"U13",cat:"U",text:"Potrafi opisywać, uzasadniać i wyjaśniać zachowania człowieka, wykorzystując wiedzę z zakresu psychologii.",mp:[],notes:""},
+{id:"U14",code:"U14",cat:"U",text:"Potrafi wykorzystać teorie psychologiczne do modelowania charakterystyki użytkownika oraz przewidywania jego zachowań w celu optymalizacji systemów AI.",mp:[],notes:""},
+{id:"U15",code:"U15",cat:"U",text:"Potrafi wykorzystać metody badawcze psychologii do diagnozowania potrzeb użytkowników oraz projektowania i ewaluacji systemów AI.",mp:[],notes:""},
+{id:"U16",code:"U16",cat:"U",text:"Potrafi prowadzić komunikację z interesariuszami, posługując się terminologią właściwą dla informatyki technicznej i psychologii.",mp:[],notes:""},
+{id:"U17",code:"U17",cat:"U",text:"Potrafi brać udział w debacie dotyczącej rozwiązań AI, prezentując i oceniając różne stanowiska.",mp:[],notes:""},
+{id:"U18",code:"U18",cat:"U",text:"Potrafi posługiwać się językiem obcym na poziomie B2 ESOKJ.",mp:[],notes:""},
+{id:"U19",code:"U19",cat:"U",text:"Potrafi planować i organizować pracę indywidualną oraz zespołową w grupach interdyscyplinarnych realizujących projekty AI.",mp:[],notes:""},
+{id:"U20",code:"U20",cat:"U",text:"Potrafi planować i realizować rozwój zawodowy i osobisty, wcielając ideę kształcenia ustawicznego.",mp:[],notes:""},
+{id:"K01",code:"K01",cat:"K",text:"Jest gotów do krytycznej oceny posiadanej wiedzy z informatyki i psychologii, będąc świadomym konieczności jej poszerzania i aktualizowania.",mp:[],notes:""},
+{id:"K02",code:"K02",cat:"K",text:"Jest gotów do krytycznej oceny możliwości i ograniczeń AI w obszarach wymagających empatii, etyki oraz rozumienia psychospołecznych uwarunkowań.",mp:[],notes:""},
+{id:"K03",code:"K03",cat:"K",text:"Jest gotów do zasięgania opinii ekspertów przy trudnościach z samodzielnym rozwiązaniem problemu związanego z AI.",mp:[],notes:""},
+{id:"K04",code:"K04",cat:"K",text:"Jest gotów do inicjowania projektów społecznych na rzecz poprawy jakości życia z zastosowaniem nowych technologii.",mp:[],notes:""},
+{id:"K05",code:"K05",cat:"K",text:"Jest gotów do myślenia i działania w sposób przedsiębiorczy, dążąc do tworzenia innowacyjnych rozwiązań AI.",mp:[],notes:""},
+{id:"K06",code:"K06",cat:"K",text:"Jest gotów do brania etycznej odpowiedzialności za projektowane systemy AI, ze szczególnym uwzględnieniem dobrostanu, prywatności i autonomii.",mp:[],notes:""},
+{id:"K07",code:"K07",cat:"K",text:"Jest gotów do odpowiedzialnego pełnienia ról zawodowych, dbając o dorobek i tradycje zawodu inżyniera.",mp:[],notes:""},
+{id:"K08",code:"K08",cat:"K",text:"Ma świadomość ważności systematycznej aktywności fizycznej dla zdrowia fizycznego i psychicznego.",mp:[],notes:""}
 ];
 
 const INIT_COURSES=[
-{id:"s1-pnt1",name:"Psychologia nowych technologii 1",sem:1,owner:"USWPS",h:60,ct:["Metoda naukowa w badaniu technologii","Cyfrowa demencja; wpływ Sieci na procesy myślowe","Iluzoryczna wielozadaniowość (Turkle); rozproszona uwaga","Lęk przed odrzuceniem; kultura narcyzmu; media społecznościowe a samoocena","Stres informacyjny; brak samokontroli; nadmiar bodźców cyfrowych","Algorytmy w personalizacji nauczania","Różnice międzypokoleniowe w przyswajaniu wiedzy online","Kreowanie marki i zachowania użytkowników w mediach","Agresja elektroniczna i cyberbullying"],at:["LLM jako zewnętrzne rusztowanie poznawcze","Delegowanie zadań poznawczych do AI","Pokolenia cyfrowe vs analogowe w interakcji z generatywną AI","Antropomorfizacja i efekt doliny niesamowitości","Uprzedzenia w AI; algorytmy a ludzkie błędy poznawcze","Projektowanie AI budującego zaufanie użytkownika","Affective computing"]},
-{id:"s1-wps",name:"Wprowadzenie do psychologii społecznej",sem:1,owner:"USWPS",h:60,ct:["Mechanizmy wpływu społecznego, konformizm i autorytet","Poznanie społeczne","Atrybucja społeczna","Grupy i relacje międzygrupowe","Stereotypy i uprzedzenia","Tożsamość społeczna i współzależność","Moralność","Postawy"],at:["Ludzkie uprzedzenia w zbiorach danych i algorytmach","Psychologia polaryzacji napędzanej przez algorytmy","Czy zasady psychologii społecznej działają w kontakcie z AI?"]},
-{id:"s1-pup",name:"Podstawowe umiejętności psychologiczne",sem:1,owner:"USWPS",h:30,ct:[],at:[]},{id:"s1-am",name:"Analiza matematyczna dla informatyków",sem:1,owner:"PWr",h:90,ct:[],at:[]},{id:"s1-alg",name:"Algebra dla informatyków",sem:1,owner:"PWr",h:60,ct:[],at:[]},{id:"s1-prog",name:"Programowanie",sem:1,owner:"PWr",h:75,ct:[],at:[]},{id:"s1-ua",name:"Umiejętności akademickie (onboarding)",sem:1,owner:"inne",h:30,ct:[],at:[]},
-{id:"s2-ps",name:"Psychologia społeczna",sem:2,owner:"USWPS",h:60,ct:["Psychologia międzykulturowa","Prospołeczność i agresja","Atrakcyjność, miłość i bliskie związki","Szczęście"],at:["Nauki o sieciach w kontekście wpływu społecznego","Nowe technologie a relacje i kapitał społeczny","Challenge-based learning"]},
-{id:"s2-pem",name:"Psychologia emocji i motywacji",sem:2,owner:"USWPS",h:60,ct:["Podstawowe koncepcje emocji","Biologiczne, społeczne i poznawcze czynniki wzbudzania emocji","Koncepcje emocji podstawowych; teoria Feldman-Barrett","Złożoność procesów afektywnych","Różnice indywidualne w procesach afektywnych i motywacyjnych","Funkcje emocji i ich związek z poznaniem","Motywacja: teorie socjobiologiczne, behawioralne, poznawcze","Typy motywacji","Mechanizmy motywacyjne; SDT","Teorie celów","Osobowość a motywacja; siła woli; samoregulacja"],at:["Wykrywanie stanów emocjonalnych użytkownika","Modelowanie systemów nagród w AI vs układ dopaminergiczny","Regulacja emocji w interakcji z AI"]},
-{id:"s2-upg",name:"Umiejętność pracy w grupie",sem:2,owner:"USWPS",h:30,ct:[],at:[]},{id:"s2-log",name:"Matematyka dyskretna z elementami logiki",sem:2,owner:"PWr",h:60,ct:[],at:[]},{id:"s2-wai",name:"Wstęp do sztucznej inteligencji",sem:2,owner:"PWr",h:60,ct:[],at:[]},{id:"s2-um",name:"Uczenie maszynowe",sem:2,owner:"PWr",h:60,ct:[],at:[]},{id:"s2-asd",name:"Algorytmy i struktury danych",sem:2,owner:"PWr",h:60,ct:[],at:[]},{id:"s2-wf",name:"Wychowanie fizyczne",sem:2,owner:"PWr",h:30,ct:[],at:[]},
-{id:"s3-met",name:"Metodologia badań psychologicznych z elementami psychometrii",sem:3,owner:"USWPS",h:60,ct:["Teoria naukowa, hipotezy, konceptualizacja, pomiar","Model eksperymentalny i korelacyjny","Projektowanie eksperymentów","Etyka badań psychologicznych","CTT vs IRT","Analiza Czynnikowa (EFA i CFA)","Spójność wewnętrzna; stabilność test-retest","Trafność zbieżna i różnicowa"],at:["Testy psychologiczne do oceny modeli LLM","Zastępowanie ankiet analizą zachowań przy użyciu ML","Prywatność danych psychometrycznych","AI jako narzędzie metodologiczne"]},
-{id:"s3-pp",name:"Psychologia poznawcza",sem:3,owner:"USWPS",h:45,ct:["Spostrzeganie","Uwaga","Pamięć","Pojęcia i kategorie","Myślenie i rozwiązywanie problemów","Sądy, decyzje i heurystyki","Rozumowanie","Psycholingwistyka","Neuronauka poznawcza","Reprezentacja wiedzy","Kreatywność","Świadomość"],at:["Reprezentacja wiedzy w AI","CNN vs ludzki układ wzrokowy","XAI","Wpływ AI na procesy poznawcze","AI jako symulacja procesów poznawczych","Racjonalność: człowiek vs AI","Embodied cognition"]},
-{id:"s3-ug",name:"Uczenie głębokie",sem:3,owner:"PWr",h:60,ct:[],at:[]},{id:"s3-dane",name:"Metody pozyskiwania, przetwarzania i składowania danych",sem:3,owner:"PWr",h:60,ct:[],at:[]},{id:"s3-rps",name:"Rachunek prawdopodobieństwa i statystyka",sem:3,owner:"PWr",h:75,ct:[],at:[]},{id:"s3-wf",name:"Wychowanie fizyczne",sem:3,owner:"PWr",h:30,ct:[],at:[]},{id:"s3-lek",name:"Lektorat",sem:3,owner:"PWr",h:60,ct:[],at:[]},
-{id:"s4-pnt2",name:"Psychologia nowych technologii 2",sem:4,owner:"USWPS",h:60,ct:[],at:[]},
-{id:"s4-por",name:"Psychologia osobowości i różnic indywidualnych",sem:4,owner:"USWPS",h:60,ct:["Psychodynamiczne koncepcje osobowości","Humanistyczne koncepcje","Cechowe teorie (Wielka Piątka)","Poznawcze podejście","Teoria Bandury; Mischel","Koncepcje Ja","Temperament","Inteligencja i zdolności","Inteligencja emocjonalna","Style poznawcze","Twórczość"],at:["Przewidywanie cech osobowości z cyfrowego śladu","Dostosowywanie interfejsów AI do profilu psychologicznego","Projektowanie osobowości asystentów głosowych"]},
-{id:"s4-str1",name:"Szybkie tworzenie rozwiązań AI 1",sem:4,owner:"PWr",h:60,ct:[],at:[]},{id:"s4-hci",name:"Interakcja człowiek–AI i człowiek–komputer",sem:4,owner:"PWr",h:60,ct:[],at:[]},{id:"s4-sz",name:"Sieci złożone",sem:4,owner:"PWr",h:60,ct:[],at:[]},{id:"s4-mmai",name:"Multimodalna Sztuczna Inteligencja",sem:4,owner:"PWr",h:60,ct:[],at:[]},{id:"s4-lek",name:"Lektorat",sem:4,owner:"PWr",h:60,ct:[],at:[]},
-{id:"s5-cyber",name:"Cyberbezpieczeństwo a psychologia",sem:5,owner:"USWPS",h:60,ct:[],at:[]},
-{id:"s5-wops",name:"Wybrane obszary psychologii stosowanej",sem:5,owner:"USWPS",h:60,ct:[],at:["AI w diagnozie zdrowia psychicznego","Rozwiązywanie realnych problemów","Odpowiedzialność społeczna; mentoring"]},
-{id:"s5-etyka",name:"Etyka w zastosowaniu sztucznej inteligencji",sem:5,owner:"USWPS",h:60,ct:["Etyka normatywna","Psychologia moralności; Haidt","Prawo prywatności","Wina i sprawstwo w prawie","Etyka zawodowa psychologa i inżyniera"],at:["Uprzedzenia w danych treningowych","XAI","AI Act","Alignment","Dezinformacja generowana przez AI","Status prawny utworów AI"]},
-{id:"s5-str2",name:"Szybkie tworzenie rozwiązań AI 2",sem:5,owner:"PWr",h:60,ct:[],at:[]},{id:"s5-wdr",name:"Wdrażanie i utrzymanie rozwiązań opartych o AI",sem:5,owner:"PWr",h:60,ct:[],at:[]},{id:"s5-bwh",name:"Blok przedmiotów humanistycznych – USWPS",sem:5,owner:"USWPS",h:60,ct:[],at:[]},{id:"s5-bw1p",name:"Blok przedmiotów wybieralnych 1 – PWr",sem:5,owner:"PWr",h:30,ct:[],at:[]},{id:"s5-ia",name:"Informatyka afektywna",sem:5,owner:"PWr",h:60,ct:[],at:[]},
-{id:"s6-pb1",name:"Projekt badawczy 1",sem:6,owner:"USWPS",h:30,ct:[],at:[]},{id:"s6-uo",name:"Umiejętności osobiste",sem:6,owner:"USWPS",h:30,ct:[],at:[]},{id:"s6-bwp",name:"Bloki przedmiotów wybieralnych – PWr",sem:6,owner:"PWr",h:120,ct:[],at:[]},{id:"s6-zpai1",name:"Zespołowy projekt sztucznej inteligencji 1",sem:6,owner:"PWr",h:30,ct:[],at:[]},{id:"s6-bwus",name:"Bloki przedmiotów wybieralnych – USWPS",sem:6,owner:"USWPS",h:60,ct:[],at:[]},{id:"s6-prakt",name:"Praktyki zawodowe",sem:6,owner:"inne",h:150,ct:[],at:[]},
-{id:"s7-neuro",name:"Neurokognitywistyka w projektowaniu AI",sem:7,owner:"USWPS",h:60,ct:["Anatomia funkcjonalna mózgu","Neurobiologia uczenia się i pamięci","Metody obrazowania mózgu","Specjalizacja półkulowa","Spostrzeganie i rozpoznawanie obiektów","Uwaga i kontrola motoryczna","Pamięć i emocje","Język","Funkcje wykonawcze","Poznanie społeczne (ToM, neurony lustrzane)","Świadomość (Global Workspace Theory)"],at:["Architektury sieci neuronowych inspirowane korą","Interfejsy mózg-komputer","Czy maszyna może mieć umysł?"]},
-{id:"s7-pb2",name:"Projekt badawczy 2",sem:7,owner:"USWPS",h:30,ct:[],at:[]},{id:"s7-zpai2",name:"Zespołowy projekt sztucznej inteligencji 2",sem:7,owner:"PWr",h:90,ct:[],at:[]},{id:"s7-bwus",name:"Blok przedmiotów wybieralnych 4 USWPS",sem:7,owner:"USWPS",h:90,ct:[],at:[]},{id:"s7-bwp",name:"Blok przedmiotów wybieralnych 2 PWr",sem:7,owner:"PWr",h:60,ct:[],at:[]}
+{id:"s1-pnt1",name:"Psychologia nowych technologii 1",sem:1,owner:"USWPS",h:60,notes:"",ct:["Metoda naukowa w badaniu technologii","Cyfrowa demencja; wpływ Sieci na procesy myślowe","Iluzoryczna wielozadaniowość (Turkle)","Lęk przed odrzuceniem; kultura narcyzmu; media społecznościowe a samoocena","Stres informacyjny; nadmiar bodźców cyfrowych","Algorytmy w personalizacji nauczania","Różnice międzypokoleniowe w przyswajaniu wiedzy online","Kreowanie marki i zachowania użytkowników w mediach","Agresja elektroniczna i cyberbullying"],at:["LLM jako zewnętrzne rusztowanie poznawcze","Delegowanie zadań poznawczych do AI","Pokolenia cyfrowe vs analogowe w interakcji z generatywną AI","Antropomorfizacja i efekt doliny niesamowitości","Uprzedzenia w AI; algorytmy a ludzkie błędy poznawcze","Projektowanie AI budującego zaufanie użytkownika","Affective computing"]},
+{id:"s1-wps",name:"Wprowadzenie do psychologii społecznej",sem:1,owner:"USWPS",h:60,notes:"",ct:["Mechanizmy wpływu społecznego, konformizm i autorytet","Poznanie społeczne","Atrybucja społeczna","Grupy i relacje międzygrupowe","Stereotypy i uprzedzenia","Tożsamość społeczna i współzależność","Moralność","Postawy"],at:["Ludzkie uprzedzenia w zbiorach danych i algorytmach","Psychologia polaryzacji napędzanej przez algorytmy","Czy zasady psychologii społecznej działają w kontakcie z AI?"]},
+{id:"s1-pup",name:"Podstawowe umiejętności psychologiczne",sem:1,owner:"USWPS",h:30,notes:"",ct:[],at:[]},{id:"s1-am",name:"Analiza matematyczna dla informatyków",sem:1,owner:"PWr",h:90,notes:"",ct:[],at:[]},{id:"s1-alg",name:"Algebra dla informatyków",sem:1,owner:"PWr",h:60,notes:"",ct:[],at:[]},{id:"s1-prog",name:"Programowanie",sem:1,owner:"PWr",h:75,notes:"",ct:[],at:[]},{id:"s1-ua",name:"Umiejętności akademickie (onboarding)",sem:1,owner:"inne",h:30,notes:"",ct:[],at:[]},
+{id:"s2-ps",name:"Psychologia społeczna",sem:2,owner:"USWPS",h:60,notes:"",ct:["Psychologia międzykulturowa","Prospołeczność i agresja","Atrakcyjność, miłość i bliskie związki","Szczęście"],at:["Nauki o sieciach w kontekście wpływu społecznego","Nowe technologie a relacje i kapitał społeczny","Challenge-based learning"]},
+{id:"s2-pem",name:"Psychologia emocji i motywacji",sem:2,owner:"USWPS",h:60,notes:"",ct:["Podstawowe koncepcje emocji","Biologiczne, społeczne i poznawcze czynniki wzbudzania emocji","Koncepcje emocji podstawowych; teoria Feldman-Barrett","Złożoność procesów afektywnych","Różnice indywidualne w procesach afektywnych i motywacyjnych","Funkcje emocji i ich związek z poznaniem","Motywacja: teorie socjobiologiczne, behawioralne, poznawcze","Typy motywacji","Mechanizmy motywacyjne; SDT","Teorie celów","Osobowość a motywacja; siła woli; samoregulacja"],at:["Wykrywanie stanów emocjonalnych użytkownika","Modelowanie systemów nagród w AI vs układ dopaminergiczny","Regulacja emocji w interakcji z AI"]},
+{id:"s2-upg",name:"Umiejętność pracy w grupie",sem:2,owner:"USWPS",h:30,notes:"",ct:[],at:[]},{id:"s2-log",name:"Matematyka dyskretna z elementami logiki",sem:2,owner:"PWr",h:60,notes:"",ct:[],at:[]},{id:"s2-wai",name:"Wstęp do sztucznej inteligencji",sem:2,owner:"PWr",h:60,notes:"",ct:[],at:[]},{id:"s2-um",name:"Uczenie maszynowe",sem:2,owner:"PWr",h:60,notes:"",ct:[],at:[]},{id:"s2-asd",name:"Algorytmy i struktury danych",sem:2,owner:"PWr",h:60,notes:"",ct:[],at:[]},{id:"s2-wf",name:"Wychowanie fizyczne",sem:2,owner:"PWr",h:30,notes:"",ct:[],at:[]},
+{id:"s3-met",name:"Metodologia badań psychologicznych z elementami psychometrii",sem:3,owner:"USWPS",h:60,notes:"",ct:["Teoria naukowa, hipotezy, konceptualizacja, pomiar","Model eksperymentalny i korelacyjny","Projektowanie eksperymentów","Etyka badań psychologicznych","CTT vs IRT","Analiza Czynnikowa (EFA i CFA)","Spójność wewnętrzna; stabilność test-retest","Trafność zbieżna i różnicowa"],at:["Testy psychologiczne do oceny modeli LLM","Zastępowanie ankiet analizą zachowań przy użyciu ML","Prywatność danych psychometrycznych","AI jako narzędzie metodologiczne"]},
+{id:"s3-pp",name:"Psychologia poznawcza",sem:3,owner:"USWPS",h:45,notes:"",ct:["Spostrzeganie","Uwaga","Pamięć","Pojęcia i kategorie","Myślenie i rozwiązywanie problemów","Sądy, decyzje i heurystyki","Rozumowanie","Psycholingwistyka","Neuronauka poznawcza","Reprezentacja wiedzy","Kreatywność","Świadomość"],at:["Reprezentacja wiedzy w AI","CNN vs ludzki układ wzrokowy","XAI","Wpływ AI na procesy poznawcze","AI jako symulacja procesów poznawczych","Racjonalność: człowiek vs AI","Embodied cognition"]},
+{id:"s3-ug",name:"Uczenie głębokie",sem:3,owner:"PWr",h:60,notes:"",ct:[],at:[]},{id:"s3-dane",name:"Metody pozyskiwania, przetwarzania i składowania danych",sem:3,owner:"PWr",h:60,notes:"",ct:[],at:[]},{id:"s3-rps",name:"Rachunek prawdopodobieństwa i statystyka",sem:3,owner:"PWr",h:75,notes:"",ct:[],at:[]},{id:"s3-wf",name:"Wychowanie fizyczne",sem:3,owner:"PWr",h:30,notes:"",ct:[],at:[]},{id:"s3-lek",name:"Lektorat",sem:3,owner:"PWr",h:60,notes:"",ct:[],at:[]},
+{id:"s4-pnt2",name:"Psychologia nowych technologii 2",sem:4,owner:"USWPS",h:60,notes:"",ct:[],at:[]},
+{id:"s4-por",name:"Psychologia osobowości i różnic indywidualnych",sem:4,owner:"USWPS",h:60,notes:"",ct:["Psychodynamiczne koncepcje osobowości","Humanistyczne koncepcje","Cechowe teorie (Wielka Piątka)","Poznawcze podejście","Teoria Bandury; Mischel","Koncepcje Ja","Temperament","Inteligencja i zdolności","Inteligencja emocjonalna","Style poznawcze","Twórczość"],at:["Przewidywanie cech osobowości z cyfrowego śladu","Dostosowywanie interfejsów AI do profilu psychologicznego","Projektowanie osobowości asystentów głosowych"]},
+{id:"s4-str1",name:"Szybkie tworzenie rozwiązań AI 1",sem:4,owner:"PWr",h:60,notes:"",ct:[],at:[]},{id:"s4-hci",name:"Interakcja człowiek–AI i człowiek–komputer",sem:4,owner:"PWr",h:60,notes:"",ct:[],at:[]},{id:"s4-sz",name:"Sieci złożone",sem:4,owner:"PWr",h:60,notes:"",ct:[],at:[]},{id:"s4-mmai",name:"Multimodalna Sztuczna Inteligencja",sem:4,owner:"PWr",h:60,notes:"",ct:[],at:[]},{id:"s4-lek",name:"Lektorat",sem:4,owner:"PWr",h:60,notes:"",ct:[],at:[]},
+{id:"s5-cyber",name:"Cyberbezpieczeństwo a psychologia",sem:5,owner:"USWPS",h:60,notes:"",ct:[],at:[]},
+{id:"s5-wops",name:"Wybrane obszary psychologii stosowanej",sem:5,owner:"USWPS",h:60,notes:"",ct:[],at:["AI w diagnozie zdrowia psychicznego","Rozwiązywanie realnych problemów","Odpowiedzialność społeczna; mentoring"]},
+{id:"s5-etyka",name:"Etyka w zastosowaniu sztucznej inteligencji",sem:5,owner:"USWPS",h:60,notes:"",ct:["Etyka normatywna","Psychologia moralności; Haidt","Prawo prywatności","Wina i sprawstwo w prawie","Etyka zawodowa psychologa i inżyniera"],at:["Uprzedzenia w danych treningowych","XAI","AI Act","Alignment","Dezinformacja generowana przez AI","Status prawny utworów AI"]},
+{id:"s5-str2",name:"Szybkie tworzenie rozwiązań AI 2",sem:5,owner:"PWr",h:60,notes:"",ct:[],at:[]},{id:"s5-wdr",name:"Wdrażanie i utrzymanie rozwiązań opartych o AI",sem:5,owner:"PWr",h:60,notes:"",ct:[],at:[]},{id:"s5-bwh",name:"Blok przedmiotów humanistycznych – USWPS",sem:5,owner:"USWPS",h:60,notes:"",ct:[],at:[]},{id:"s5-bw1p",name:"Blok przedmiotów wybieralnych 1 – PWr",sem:5,owner:"PWr",h:30,notes:"",ct:[],at:[]},{id:"s5-ia",name:"Informatyka afektywna",sem:5,owner:"PWr",h:60,notes:"",ct:[],at:[]},
+{id:"s6-pb1",name:"Projekt badawczy 1",sem:6,owner:"USWPS",h:30,notes:"",ct:[],at:[]},{id:"s6-uo",name:"Umiejętności osobiste",sem:6,owner:"USWPS",h:30,notes:"",ct:[],at:[]},{id:"s6-bwp",name:"Bloki przedmiotów wybieralnych – PWr",sem:6,owner:"PWr",h:120,notes:"",ct:[],at:[]},{id:"s6-zpai1",name:"Zespołowy projekt sztucznej inteligencji 1",sem:6,owner:"PWr",h:30,notes:"",ct:[],at:[]},{id:"s6-bwus",name:"Bloki przedmiotów wybieralnych – USWPS",sem:6,owner:"USWPS",h:60,notes:"",ct:[],at:[]},{id:"s6-prakt",name:"Praktyki zawodowe",sem:6,owner:"inne",h:150,notes:"",ct:[],at:[]},
+{id:"s7-neuro",name:"Neurokognitywistyka w projektowaniu AI",sem:7,owner:"USWPS",h:60,notes:"",ct:["Anatomia funkcjonalna mózgu","Neurobiologia uczenia się i pamięci","Metody obrazowania mózgu","Specjalizacja półkulowa","Spostrzeganie i rozpoznawanie obiektów","Uwaga i kontrola motoryczna","Pamięć i emocje","Język","Funkcje wykonawcze","Poznanie społeczne (ToM, neurony lustrzane)","Świadomość (Global Workspace Theory)"],at:["Architektury sieci neuronowych inspirowane korą","Interfejsy mózg-komputer","Czy maszyna może mieć umysł?"]},
+{id:"s7-pb2",name:"Projekt badawczy 2",sem:7,owner:"USWPS",h:30,notes:"",ct:[],at:[]},{id:"s7-zpai2",name:"Zespołowy projekt sztucznej inteligencji 2",sem:7,owner:"PWr",h:90,notes:"",ct:[],at:[]},{id:"s7-bwus",name:"Blok przedmiotów wybieralnych 4 USWPS",sem:7,owner:"USWPS",h:90,notes:"",ct:[],at:[]},{id:"s7-bwp",name:"Blok przedmiotów wybieralnych 2 PWr",sem:7,owner:"PWr",h:60,notes:"",ct:[],at:[]}
 ];
 
 const SL={1:"Semestr 1 · zima",2:"Semestr 2 · lato",3:"Semestr 3 · zima",4:"Semestr 4 · lato",5:"Semestr 5 · zima",6:"Semestr 6 · lato",7:"Semestr 7 · zima (10 tyg.)"};
 const OC_MAP={"USWPS":"var(--uswps)","PWr":"var(--pwr)","inne":"var(--other)"};
 const CAT={W:{label:"Wiedza — zna i rozumie",col:"var(--w)"},U:{label:"Umiejętności — potrafi",col:"var(--u)"},K:{label:"Kompetencje społeczne — jest gotów",col:"var(--k)"}};
 
-let db,currentUser=null;
-let S={courses:[],outcomes:[],history:[],openCourse:null,tab:"courses",fs:0,fo:"all"};
+let db,currentUser=null,presenceRef=null;
+let S={courses:[],outcomes:[],history:[],openCourse:null,tab:"courses",fs:0,fo:"all",editCourse:null,editOc:null};
+let presenceUsers={};
 
-// ─── AUTH ────────────────────────────────────────────────────────
-function doLogin(){
-  const provider=new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider).catch(e=>{document.getElementById("loginError").textContent="Błąd logowania: "+e.message});
-}
-function doLogout(){firebase.auth().signOut()}
+// ─── HELPERS ─────────────────────────────────────────────────────
+function toArr(v){if(!v)return[];if(Array.isArray(v))return v;if(typeof v==="object")return Object.values(v);return[]}
+function fixC(raw){return toArr(raw).map(c=>({...c,ct:toArr(c.ct),at:toArr(c.at),notes:c.notes||""}))}
+function fixO(raw){return toArr(raw).map(o=>({...o,mp:toArr(o.mp),notes:o.notes||""}))}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function who(){return currentUser?.displayName?.split(" ")[0]||"Anonim"}
 
-// ─── INIT ────────────────────────────────────────────────────────
+function toggleTheme(){const l=document.documentElement.classList.toggle("light");localStorage.setItem("cwb-theme",l?"light":"dark");document.querySelectorAll(".icon-btn").forEach(b=>{if(b.textContent.match(/[🌙☀️]/))b.textContent=l?"☀️":"🌙"})}
+(function(){if(localStorage.getItem("cwb-theme")==="light"){document.documentElement.classList.add("light");setTimeout(()=>document.querySelectorAll(".icon-btn").forEach(b=>{if(b.textContent==="🌙")b.textContent="☀️"}),50)}})();
+
+// ─── AUTH & DB ───────────────────────────────────────────────────
 firebase.initializeApp(FIREBASE_CONFIG);
 db=firebase.database();
 
-// Enable Google Sign-In in Firebase Console → Authentication → Sign-in method → Google → Enable
+function doLogin(){firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>{document.getElementById("loginError").textContent="Błąd: "+e.message})}
+function doLogout(){if(presenceRef)presenceRef.remove();firebase.auth().signOut()}
+
 firebase.auth().onAuthStateChanged(user=>{
   if(user){
     currentUser=user;
@@ -271,10 +264,15 @@ firebase.auth().onAuthStateChanged(user=>{
     document.getElementById("mainApp").classList.remove("hidden");
     document.getElementById("userPhoto").src=user.photoURL||"";
     document.getElementById("userDisplayName").textContent=user.displayName?.split(" ")[0]||user.email;
-    // Listen to DB
+    // Presence
+    presenceRef=db.ref("presence/"+user.uid);
+    presenceRef.set({name:user.displayName||user.email,photo:user.photoURL||"",lastSeen:firebase.database.ServerValue.TIMESTAMP});
+    presenceRef.onDisconnect().remove();
+    db.ref("presence").on("value",snap=>{presenceUsers=snap.val()||{};render()});
+    // Data
     db.ref("curriculum").on("value",snap=>{
       const d=snap.val();
-      if(d){S.courses=fixCourses(d.courses);S.outcomes=fixOutcomes(d.outcomes);S.history=toArr(d.history)}
+      if(d){S.courses=fixC(d.courses);S.outcomes=fixO(d.outcomes);S.history=toArr(d.history)}
       render();
     });
     db.ref("curriculum").once("value",snap=>{if(!snap.val())db.ref("curriculum").set({courses:INIT_COURSES,outcomes:INIT_OUTCOMES,history:[]})});
@@ -285,22 +283,20 @@ firebase.auth().onAuthStateChanged(user=>{
   }
 });
 
-// Firebase drops empty arrays and converts arrays to objects — normalize everything
-function toArr(v){if(!v)return[];if(Array.isArray(v))return v;if(typeof v==="object")return Object.values(v);return[]}
-function fixCourses(raw){return toArr(raw).map(c=>({...c,ct:toArr(c.ct),at:toArr(c.at)}))}
-function fixOutcomes(raw){return toArr(raw).map(o=>({...o,mp:toArr(o.mp)}))}
-
 function save(){db.ref("curriculum").set({courses:S.courses,outcomes:S.outcomes,history:S.history})}
-function addHist(w){const who=currentUser?.displayName?.split(" ")[0]||"Anonim";S.history.unshift({who,what:w,when:new Date().toLocaleString("pl-PL")});if(S.history.length>100)S.history.length=100}
+function addH(w){S.history.unshift({who:who(),what:w,when:new Date().toLocaleString("pl-PL")});if(S.history.length>200)S.history.length=200}
 
 // ─── RENDER ──────────────────────────────────────────────────────
 function render(){
-  const wt=S.courses.filter(c=>(c.ct&&(c.ct||[]).length)||(c.at&&(c.at||[]).length)).length;
+  const wt=S.courses.filter(c=>(c.ct||[]).length||(c.at||[]).length).length;
   document.getElementById("statusBar").innerHTML=`<span class="sync-dot"></span>Firebase · ${S.courses.length} przedm. · ${wt} z wątkami · ${S.outcomes.length} efektów`;
-  const tabs=[["courses","📚 Przedmioty"],["outcomes","🎯 Efekty uczenia"],["log","📝 Historia"]];
+  const tabs=[["courses","📚 Przedmioty"],["outcomes","🎯 Efekty uczenia"],["users","👥 Użytkownicy"],["log","📝 Historia"]];
   document.getElementById("tabs").innerHTML=tabs.map(([id,l])=>`<button class="tab ${S.tab===id?"on":""}" onclick="S.tab='${id}';render()">${l}</button>`).join("");
   const el=document.getElementById("content");
-  if(S.tab==="courses")el.innerHTML=rCourses();else if(S.tab==="outcomes")el.innerHTML=rOutcomes();else el.innerHTML=rLog();
+  if(S.tab==="courses")el.innerHTML=rCourses();
+  else if(S.tab==="outcomes")el.innerHTML=rOutcomes();
+  else if(S.tab==="users")el.innerHTML=rUsers();
+  else el.innerHTML=rLog();
 }
 
 function rCourses(){
@@ -313,22 +309,42 @@ function rCourses(){
   for(const sem of sems){
     h+=`<div class="sem-label">${SL[sem]}</div>`;
     for(const c of cs.filter(x=>x.sem===sem)){
-      const isO=S.openCourse===c.id,col=OC_MAP[c.owner]||"var(--other)";
+      const isO=S.openCourse===c.id,col=OC_MAP[c.owner]||"var(--other)",isEdit=S.editCourse===c.id;
       h+=`<div class="card ${isO?"open":""}"><div class="card-hdr" onclick="S.openCourse=S.openCourse==='${c.id}'?null:'${c.id}';render()"><div class="card-bar" style="background:${col}"></div><div style="flex:1"><div class="card-title">${esc(c.name)}</div><div class="card-meta"><span class="badge" style="background:${col}22;color:${col}">${c.owner}</span> ${c.h}h · ${(c.ct||[]).length} klas. · ${(c.at||[]).length} AI</div></div><span class="chevron">▾</span></div>`;
-      if(isO){h+=`<div class="card-body">${secB(c,"ct","classic","Wątki klasyczne","c")}<div style="height:8px"></div>${secB(c,"at","ai","Wątki interdyscyplinarne AI","a")}</div>`}
+      if(isO){
+        h+=`<div class="card-body">`;
+        // Edit course button
+        h+=`<div style="display:flex;gap:6px;margin-bottom:8px"><button class="abtn edit" onclick="event.stopPropagation();S.editCourse=S.editCourse==='${c.id}'?null:'${c.id}';render()">✏️ Edytuj przedmiot</button>`;
+        h+=`<button class="abtn del" onclick="event.stopPropagation();delCourse('${c.id}')">🗑 Usuń</button></div>`;
+        if(isEdit){
+          h+=`<div class="edit-row"><input class="inp" style="flex:2;min-width:180px" value="${esc(c.name)}" onchange="updCourse('${c.id}','name',this.value)"><select class="inp" onchange="updCourse('${c.id}','sem',+this.value)">`;
+          for(let s=1;s<=7;s++)h+=`<option value="${s}" ${c.sem===s?"selected":""}>Sem. ${s}</option>`;
+          h+=`</select><select class="inp" onchange="updCourse('${c.id}','owner',this.value)"><option ${c.owner==="USWPS"?"selected":""}>USWPS</option><option ${c.owner==="PWr"?"selected":""}>PWr</option><option value="inne" ${c.owner==="inne"?"selected":""}>inne</option></select></div>`;
+        }
+        // Notes
+        h+=`<div class="note-label">📝 Notatki do przedmiotu</div>`;
+        h+=`<textarea class="note-area" placeholder="Dodaj notatkę…" onchange="updCourse('${c.id}','notes',this.value)">${esc(c.notes||"")}</textarea>`;
+        // Topics
+        h+=secB(c,"ct","classic","Wątki klasyczne","c");
+        h+=`<div style="height:6px"></div>`;
+        h+=secB(c,"at","ai","Wątki interdyscyplinarne AI","a");
+        h+=`</div>`;
+      }
       h+=`</div>`;
     }
   }
-  h+=`<div class="stats"><span>Z wątkami: <strong style="color:var(--green)">${S.courses.length-S.courses.filter(c=>!(c.ct||[]).length&&!(c.at||[]).length).length}</strong></span><span>Bez wątków: <strong style="color:var(--red)">${S.courses.filter(c=>!(c.ct||[]).length&&!(c.at||[]).length).length}</strong></span></div>`;
+  const noT=S.courses.filter(c=>!(c.ct||[]).length&&!(c.at||[]).length).length;
+  h+=`<div class="stats"><span>Z wątkami: <strong style="color:var(--green)">${S.courses.length-noT}</strong></span><span>Bez wątków: <strong style="color:var(--red)">${noT}</strong></span></div>`;
   h+=rIO();return h;
 }
 
 function secB(c,key,cls,label,tc){
-  let h=`<div class="sec-hdr"><span class="sec-label ${cls}">${label} (${(c[key]||[]).length})</span><button class="abtn ${cls}" onclick="toggleAdd('${c.id}','${tc}')">+ Dodaj</button></div>`;
+  const arr=c[key]||[];
+  let h=`<div class="sec-hdr"><span class="sec-label ${cls}">${label} (${arr.length})</span><button class="abtn ${cls}" onclick="toggleAdd('${c.id}','${tc}')">+ Dodaj</button></div>`;
   h+=`<div id="add-${tc}-${c.id}" style="display:none" class="add-row"><input class="inp" style="flex:1" id="inp-${tc}-${c.id}" placeholder="Nowy wątek…" onkeydown="if(event.key==='Enter')doAdd('${c.id}','${tc}','${key}')"><button class="abtn ${cls}" onclick="doAdd('${c.id}','${tc}','${key}')">OK</button></div>`;
-  if(!(c[key]||[]).length)h+=`<div class="empty-msg">Brak wątków – kliknij + Dodaj</div>`;
-  const ds=cls==="classic"?"color:var(--tx4)":"color:#6a4a38",ts=cls==="classic"?"color:var(--tx2)":"color:#c09570",dc=cls==="classic"?"•":"◆";
-  (c[key]||[]).forEach((t,i)=>{h+=`<div class="topic"><span class="dot" style="${ds}">${dc}</span><span class="txt" style="${ts}">${esc(t)}</span><button class="rm" onclick="rmTopic('${c.id}','${key}',${i})">×</button></div>`});
+  if(!arr.length)h+=`<div class="empty-msg">Brak wątków – kliknij + Dodaj</div>`;
+  const ds=cls==="classic"?"color:var(--tx4)":"color:var(--ai-dot)",ts=cls==="classic"?"color:var(--tx2)":"color:var(--ai-txt)",dc=cls==="classic"?"•":"◆";
+  arr.forEach((t,i)=>{h+=`<div class="topic"><span class="dot" style="${ds}">${dc}</span><span class="txt" style="${ts}">${esc(t)}</span><button class="rm" onclick="rmTopic('${c.id}','${key}',${i})">×</button></div>`});
   return h;
 }
 
@@ -338,17 +354,47 @@ function rOutcomes(){
     const items=S.outcomes.filter(o=>o.cat===cat);if(!items.length)continue;
     h+=`<div class="cat-header" style="color:${info.col}">${info.label} (${items.length})</div>`;
     items.forEach(o=>{
-      h+=`<div class="oc-card"><div class="oc-hdr"><span class="oc-code" style="color:${info.col};background:${info.col}15">${esc(o.code)}</span><span class="oc-txt">${esc(o.text)}</span></div><div class="chips">`;
+      const isEdit=S.editOc===o.id;
+      h+=`<div class="oc-card">`;
+      if(isEdit){
+        h+=`<div class="edit-row"><input class="inp" style="width:70px" value="${esc(o.code)}" onchange="updOc('${o.id}','code',this.value)"><select class="inp" onchange="updOc('${o.id}','cat',this.value)"><option value="W" ${o.cat==="W"?"selected":""}>W</option><option value="U" ${o.cat==="U"?"selected":""}>U</option><option value="K" ${o.cat==="K"?"selected":""}>K</option></select><button class="abtn del" onclick="delOc('${o.id}')">🗑</button><button class="abtn edit" onclick="S.editOc=null;render()">✓ Gotowe</button></div>`;
+        h+=`<textarea class="inp" style="margin-top:6px;min-height:60px;resize:vertical" onchange="updOc('${o.id}','text',this.value)">${esc(o.text)}</textarea>`;
+      } else {
+        h+=`<div class="oc-hdr"><span class="oc-code" style="color:${info.col};background:${info.col}15">${esc(o.code)}</span><span class="oc-txt">${esc(o.text)}</span><button class="abtn edit" style="flex-shrink:0;font-size:11px" onclick="S.editOc='${o.id}';render()">✏️</button></div>`;
+      }
+      // Notes
+      h+=`<div class="note-label">📝 Notatka</div><textarea class="note-area" rows="1" placeholder="Notatka…" onchange="updOc('${o.id}','notes',this.value)">${esc(o.notes||"")}</textarea>`;
+      // Mapping chips
+      h+=`<div class="chips">`;
       wt.forEach(c=>{const m=(o.mp||[]).includes(c.id);const short=c.name.length>20?c.name.substring(0,18)+"…":c.name;
-        h+=`<button class="chip" title="${esc(c.name)}" style="background:${m?info.col+"28":"var(--bg)"};color:${m?info.col:"var(--tx4)"};font-weight:${m?600:400}" onclick="togMap('${o.id}','${c.id}')">${esc(short)}</button>`});
+        h+=`<button class="chip" title="${esc(c.name)}" style="background:${m?info.col+"28":"var(--chip-off)"};color:${m?info.col:"var(--tx4)"};font-weight:${m?600:400}" onclick="togMap('${o.id}','${c.id}')">${esc(short)}</button>`});
       h+=`</div></div>`;
     });
   }
   h+=rIO();return h;
 }
 
+function rUsers(){
+  const users=Object.values(presenceUsers);
+  let h=`<div style="font-size:15px;font-weight:600;color:var(--txH);margin-bottom:14px">👥 Aktualnie zalogowani (${users.length})</div>`;
+  h+=`<div class="presence-bar">`;
+  users.forEach(u=>{h+=`<div class="presence-pill"><img src="${esc(u.photo)}" alt=""><span class="online-dot"></span><span>${esc(u.name)}</span></div>`});
+  h+=`</div>`;
+  // Per-user history
+  const byUser={};S.history.forEach(e=>{if(!byUser[e.who])byUser[e.who]=[];byUser[e.who].push(e)});
+  h+=`<div style="font-size:15px;font-weight:600;color:var(--txH);margin:20px 0 10px">📊 Aktywność użytkowników</div>`;
+  Object.entries(byUser).sort((a,b)=>b[1].length-a[1].length).forEach(([name,entries])=>{
+    h+=`<div style="margin-bottom:12px;padding:12px 16px;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius)">`;
+    h+=`<div style="font-weight:600;color:var(--acc);font-size:14px;margin-bottom:4px">${esc(name)} <span style="color:var(--tx3);font-weight:400;font-size:12px">· ${entries.length} zmian</span></div>`;
+    entries.slice(0,5).forEach(e=>{h+=`<div style="font-size:12px;color:var(--tx2);padding:2px 0">${esc(e.what)} <span style="color:var(--tx4);font-size:10px">${esc(e.when)}</span></div>`});
+    if(entries.length>5)h+=`<div style="font-size:11px;color:var(--tx4);margin-top:3px">…i ${entries.length-5} więcej</div>`;
+    h+=`</div>`;
+  });
+  return h;
+}
+
 function rLog(){
-  let h=`<div style="font-size:13px;color:var(--tx3);margin-bottom:10px">Historia zmian (synchronizowana w czasie rzeczywistym)</div>`;
+  let h=`<div style="font-size:14px;color:var(--tx3);margin-bottom:10px">Pełna historia zmian (${S.history.length}) — synchronizowana w czasie rzeczywistym</div>`;
   if(!S.history.length)h+=`<div style="text-align:center;padding:30px;color:var(--tx4)">Brak zmian</div>`;
   S.history.forEach(e=>{h+=`<div class="log-row"><span class="log-who">${esc(e.who)}</span><span class="log-what">${esc(e.what)}</span><span class="log-when">${esc(e.when)}</span></div>`});
   h+=rIO();return h;
@@ -358,21 +404,16 @@ function rIO(){return`<div class="io-bar"><button class="io-btn" onclick="doExpo
 
 // ─── ACTIONS ─────────────────────────────────────────────────────
 function toggleAdd(cid,t){const el=document.getElementById(`add-${t}-${cid}`);if(el){el.style.display=el.style.display==="none"?"flex":"none";if(el.style.display==="flex")el.querySelector("input").focus()}}
-function doAdd(cid,t,key){const inp=document.getElementById(`inp-${t}-${cid}`);if(!inp||!inp.value.trim())return;const c=S.courses.find(x=>x.id===cid);if(!c)return;if(!c[key])c[key]=[];c[key].push(inp.value.trim());addHist(`+ ${key==="ct"?"klas.":"AI"} → „${c.name.substring(0,25)}…"`);save()}
-function rmTopic(cid,key,idx){const c=S.courses.find(x=>x.id===cid);if(!c)return;c[key].splice(idx,1);addHist(`− wątek z „${c.name.substring(0,25)}…"`);save()}
+function doAdd(cid,t,key){const inp=document.getElementById(`inp-${t}-${cid}`);if(!inp||!inp.value.trim())return;const c=S.courses.find(x=>x.id===cid);if(!c)return;if(!c[key])c[key]=[];c[key].push(inp.value.trim());addH(`+ ${key==="ct"?"klas.":"AI"} → „${c.name.substring(0,25)}…"`);save()}
+function rmTopic(cid,key,idx){const c=S.courses.find(x=>x.id===cid);if(!c||!c[key])return;c[key].splice(idx,1);addH(`− wątek z „${c.name.substring(0,25)}…"`);save()}
+function updCourse(cid,field,val){const c=S.courses.find(x=>x.id===cid);if(!c)return;c[field]=val;if(field!=="notes")addH(`Edycja ${field} → „${String(val).substring(0,30)}…"`);save()}
+function delCourse(cid){const c=S.courses.find(x=>x.id===cid);if(!c||!confirm(`Usunąć „${c.name}"?`))return;S.courses=S.courses.filter(x=>x.id!==cid);S.openCourse=null;addH(`🗑 Usunięto „${c.name.substring(0,30)}"`);save()}
+function updOc(oid,field,val){const o=S.outcomes.find(x=>x.id===oid);if(!o)return;o[field]=val;if(field!=="notes")addH(`Edycja efektu ${o.code}: ${field}`);save()}
+function delOc(oid){const o=S.outcomes.find(x=>x.id===oid);if(!o||!confirm(`Usunąć efekt ${o.code}?`))return;S.outcomes=S.outcomes.filter(x=>x.id!==oid);addH(`🗑 Usunięto efekt ${o.code}`);save()}
 function togMap(oid,cid){const o=S.outcomes.find(x=>x.id===oid);if(!o)return;if(!o.mp)o.mp=[];const i=o.mp.indexOf(cid);if(i>=0)o.mp.splice(i,1);else o.mp.push(cid);save()}
 function doExport(){const d=JSON.stringify({courses:S.courses,outcomes:S.outcomes,history:S.history},null,2);const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([d],{type:"application/json"}));a.download=`curriculum-${new Date().toISOString().slice(0,10)}.json`;a.click()}
-function doImport(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(d.courses)S.courses=d.courses;if(d.outcomes)S.outcomes=d.outcomes;if(d.history)S.history=d.history;addHist("Import z pliku");save();alert("Zaimportowano!")}catch(err){alert("Błąd: "+err.message)}};r.readAsText(f);ev.target.value=""}
-function doReset(){if(!confirm("Przywrócić dane początkowe?"))return;S.courses=JSON.parse(JSON.stringify(INIT_COURSES));S.outcomes=JSON.parse(JSON.stringify(INIT_OUTCOMES));addHist("RESET");save()}
-function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-
-function toggleTheme(){
-  const isLight=document.documentElement.classList.toggle("light");
-  localStorage.setItem("cwb-theme",isLight?"light":"dark");
-  document.querySelectorAll(".theme-btn").forEach(b=>b.textContent=isLight?"☀️":"🌙");
-}
-// Restore theme
-(function(){const t=localStorage.getItem("cwb-theme");if(t==="light"){document.documentElement.classList.add("light");setTimeout(()=>{document.querySelectorAll(".theme-btn").forEach(b=>b.textContent="☀️")},100)}})();</script>
+function doImport(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(d.courses)S.courses=d.courses;if(d.outcomes)S.outcomes=d.outcomes;if(d.history)S.history=d.history;addH("Import z pliku");save();alert("Zaimportowano!")}catch(err){alert("Błąd: "+err.message)}};r.readAsText(f);ev.target.value=""}
+function doReset(){if(!confirm("Przywrócić dane początkowe? Wszystkie zmiany zostaną utracone."))return;S.courses=JSON.parse(JSON.stringify(INIT_COURSES));S.outcomes=JSON.parse(JSON.stringify(INIT_OUTCOMES));addH("RESET");save()}
+</script>
 </body>
 </html>
-
