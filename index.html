@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curriculum Workbench · AI z Psychologią</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#090b10;--bg2:#0d1018;--bg3:#121620;--bg4:#171c2a;--bdr:#1a1f30;--bdr2:#252e45;--tx:#d0d5e0;--tx2:#8b92a5;--tx3:#5a6278;--tx4:#363d50;--uswps:#e8854f;--pwr:#54a5e8;--other:#777;--acc:#e8854f;--w:#6cb4d9;--u:#a87dd4;--k:#6dd4a8;--red:#d45454;--green:#54d48a;--radius:10px}
+html{font-size:15px}body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;transition:all .15s}input,textarea,select{font-family:inherit;outline:none}
+::selection{background:var(--acc);color:var(--bg)}
+
+/* LOGIN */
+.login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{max-width:420px;width:100%;background:var(--bg3);border-radius:16px;border:1px solid var(--bdr2);padding:40px 32px;text-align:center}
+.login-box .logo{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--uswps),var(--pwr));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:var(--bg);margin:0 auto 16px;box-shadow:0 4px 20px rgba(232,133,79,.3)}
+.login-box h1{font-size:22px;color:#f0f2f8;margin-bottom:4px;letter-spacing:-.03em}
+.login-box .sub{font-size:12px;color:var(--tx3);margin-bottom:28px}
+.google-btn{display:inline-flex;align-items:center;gap:10px;padding:12px 28px;border-radius:10px;background:#fff;color:#333;font-weight:600;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.2);transition:all .15s}
+.google-btn:hover{box-shadow:0 4px 16px rgba(0,0,0,.3);transform:translateY(-1px)}
+.google-btn svg{width:20px;height:20px}
+.login-error{color:var(--red);font-size:12px;margin-top:12px}
+
+/* HEADER */
+.hdr{background:linear-gradient(180deg,#0e1220,#0b0e16);border-bottom:1px solid var(--bdr);padding:16px 22px 12px;position:sticky;top:0;z-index:100}
+.hdr-row{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.hdr .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--uswps),var(--pwr));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--bg);flex-shrink:0}
+.hdr h1{font-size:17px;font-weight:700;color:#f0f2f8;letter-spacing:-.03em}
+.hdr .sub{font-size:11px;color:var(--tx3);margin-top:1px}
+.sync-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;vertical-align:middle;background:var(--green);box-shadow:0 0 6px rgba(84,212,138,.5)}
+.user-pill{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:20px;background:var(--bg2);border:1px solid var(--bdr)}
+.user-pill img{width:26px;height:26px;border-radius:50%}
+.user-pill span{font-size:11px;color:var(--tx2);font-weight:500;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logout-btn{background:none;color:var(--tx4);font-size:11px;padding:4px 8px;border-radius:5px}
+.logout-btn:hover{color:var(--red)}
+.tabs{display:flex;gap:4px;margin-top:10px}
+.tab{flex:1;padding:9px 6px;border-radius:9px;background:transparent;color:var(--tx3);font-weight:600;font-size:12px;transition:all .2s}
+.tab:hover{color:var(--tx2)}.tab.on{background:#161d30;color:var(--acc)}
+
+/* CONTENT */
+.content{padding:14px 20px 40px;max-height:calc(100vh - 128px);overflow-y:auto;scroll-behavior:smooth}
+.content::-webkit-scrollbar{width:5px}.content::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px}
+
+/* FILTERS */
+.filters{display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap}
+.fbtn{padding:6px 13px;border-radius:7px;background:var(--bg2);color:var(--tx3);font-weight:600;font-size:12px}.fbtn:hover{color:var(--tx2)}.fbtn.on{background:var(--bdr2);color:var(--acc)}.fbtn.own.on{color:#f0f2f8}
+
+.sem-label{font-size:10px;font-weight:700;color:var(--tx4);text-transform:uppercase;letter-spacing:.12em;padding:14px 2px 6px}
+
+/* CARDS */
+.card{margin-bottom:6px;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--bdr);overflow:hidden;transition:all .2s}
+.card.open{background:var(--bg3);border-color:var(--bdr2)}
+.card-hdr{padding:12px 15px;cursor:pointer;display:flex;align-items:center;gap:10px;user-select:none}
+.card-bar{width:4px;height:28px;border-radius:2px;flex-shrink:0}
+.card-title{font-weight:600;font-size:14px;color:#e4e8f0;letter-spacing:-.01em}
+.card-meta{font-size:10.5px;color:var(--tx3);margin-top:2px}
+.badge{display:inline-block;padding:2px 7px;border-radius:5px;font-size:9.5px;font-weight:700}
+.chevron{color:var(--tx4);font-size:16px;transition:transform .25s}.card.open .chevron{transform:rotate(180deg)}
+.card-body{padding:0 15px 15px}
+
+/* TOPICS */
+.sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;margin-top:4px}
+.sec-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}.sec-label.classic{color:var(--w)}.sec-label.ai{color:var(--acc)}
+.abtn{padding:5px 12px;border-radius:6px;font-weight:600;font-size:11px}
+.abtn.classic{background:#14202e;color:var(--w)}.abtn.ai{background:#2a1c14;color:var(--acc)}
+.add-row{display:flex;gap:6px;margin-bottom:8px}
+.inp{padding:8px 11px;border:1px solid var(--bdr2);border-radius:7px;background:var(--bg);color:#e4e8f0;font-size:13px;transition:border-color .2s}.inp:focus{border-color:var(--acc)}
+.topic{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:13px;line-height:1.5;border-bottom:1px solid rgba(255,255,255,.02)}.topic:last-child{border-bottom:none}
+.topic .dot{flex-shrink:0;margin-top:3px;font-size:11px}.topic .txt{flex:1}
+.topic .rm{background:none;color:var(--tx4);font-size:16px;padding:0 2px;line-height:1;opacity:0;transition:all .15s}.topic:hover .rm{opacity:1}.topic .rm:hover{color:var(--red)}
+.empty-msg{font-size:12.5px;color:var(--tx4);font-style:italic;padding:6px 0}
+
+/* OUTCOMES */
+.cat-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:16px 0 8px;display:flex;align-items:center;gap:8px}
+.cat-header::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.oc-card{padding:12px 15px;background:var(--bg2);border-radius:var(--radius);margin-bottom:5px;border:1px solid var(--bdr);transition:border-color .15s}.oc-card:hover{border-color:var(--bdr2)}
+.oc-hdr{display:flex;gap:8px;align-items:flex-start}
+.oc-code{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:12px;flex-shrink:0;padding:2px 6px;border-radius:4px}
+.oc-txt{flex:1;font-size:13px;color:var(--tx2);line-height:1.55}
+.chips{margin-top:7px;display:flex;flex-wrap:wrap;gap:3px}
+.chip{padding:2px 7px;border-radius:4px;font-size:9.5px;cursor:pointer;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:all .15s;font-weight:500}.chip:hover{filter:brightness(1.3)}
+
+/* LOG */
+.log-row{padding:8px 12px;border-radius:7px;margin-bottom:3px;font-size:12px;display:flex;gap:10px}
+.log-row:nth-child(odd){background:var(--bg2)}.log-row:nth-child(even){background:var(--bg3)}
+.log-who{color:var(--acc);font-weight:600;flex-shrink:0;min-width:70px;font-size:11.5px}.log-what{flex:1;color:var(--tx2)}.log-when{color:var(--tx4);font-size:10px;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+
+/* IO */
+.io-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--bdr)}
+.io-btn{padding:8px 16px;border:1px solid var(--bdr2);border-radius:8px;background:var(--bg3);color:var(--tx2);font-weight:600;font-size:12px;transition:all .15s}
+.io-btn:hover{border-color:var(--acc);color:var(--acc)}.io-btn.danger{border-color:#3a1c1c;color:var(--red)}.io-btn.danger:hover{background:#1a0e0e}
+
+.stats{margin-top:16px;padding:12px 16px;background:var(--bg2);border-radius:var(--radius);display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:11.5px;color:var(--tx3);border:1px solid var(--bdr)}
+.stats strong{color:#e4e8f0}
+.hidden{display:none}
+@media(max-width:500px){.content{padding:10px 14px}.hdr{padding:14px 16px 10px}html{font-size:14px}}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+  KONFIGURACJA — WYPEŁNIJ PONIŻEJ SWOIMI DANYMI Z FIREBASE
+  Potem wrzuć ten plik jako index.html na GitHub Pages.
+  Współpracownicy otwierają link i logują się przez Google.
+============================================================ -->
+<script>
+// ╔═══════════════════════════════════════════════════════════╗
+// ║  WKLEJ TUTAJ SWÓJ FIREBASE CONFIG Z KONSOLI FIREBASE     ║
+// ║  (Project settings → General → Your apps → Web)           ║
+// ╚═══════════════════════════════════════════════════════════╝
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDiWK8kmhWU0po1s1-WkReIgIHR1wFptws",
+  authDomain: "curriculum-wb.firebaseapp.com",
+  databaseURL: "https://curriculum-wb-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "curriculum-wb",
+  storageBucket: "curriculum-wb.firebasestorage.app",
+  messagingSenderId: "806317516383",
+  appId: "1:806317516383:web:e65a0626a6562c66539dea"
+};
+</script>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <div class="logo">AI</div>
+    <h1>Curriculum Workbench</h1>
+    <div class="sub">AI z Psychologią · SWPS × Politechnika Wrocławska<br>Narzędzie do wspólnej pracy nad programem kształcenia</div>
+    <button class="google-btn" onclick="doLogin()">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Zaloguj się przez Google
+    </button>
+    <div id="loginError" class="login-error"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="hidden">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div class="logo">AI</div>
+      <div style="flex:1"><h1>Curriculum Workbench</h1><div class="sub" id="statusBar"><span class="sync-dot"></span>Połączono</div></div>
+      <div class="user-pill"><img id="userPhoto" src="" alt=""><span id="userDisplayName"></span></div>
+      <button class="logout-btn" onclick="doLogout()">Wyloguj</button>
+    </div>
+    <div class="tabs" id="tabs"></div>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────
+const INIT_OUTCOMES = [
+  {id:"W01",code:"W01",cat:"W",text:"Zna i rozumie rolę interdyscyplinarnej wiedzy integrującej informatykę techniczną i psychologię w rozwiązywaniu złożonych problemów związanych z projektowaniem i wdrażaniem systemów AI.",mp:[]},
+  {id:"W02",code:"W02",cat:"W",text:"Zna i rozumie podstawy matematyki wyższej obejmujące zagadnienia analizy, algebry, metod probabilistycznych i statystyki.",mp:[]},
+  {id:"W03",code:"W03",cat:"W",text:"Zna i rozumie narzędzia służące do projektowania głębokich sieci neuronowych.",mp:[]},
+  {id:"W04",code:"W04",cat:"W",text:"Zna i rozumie składnię nowoczesnych języków programowania, kluczowe struktury danych oraz techniki konstrukcji i analizy algorytmów.",mp:[]},
+  {id:"W05",code:"W05",cat:"W",text:"Zna i rozumie kluczowe metody zbierania, przetwarzania, analizy i wizualizacji danych.",mp:[]},
+  {id:"W06",code:"W06",cat:"W",text:"Zna i rozumie narzędzia inżynierii oprogramowania służące do analizy, projektowania, wytwarzania, testowania i utrzymania oprogramowania.",mp:[]},
+  {id:"W07",code:"W07",cat:"W",text:"Zna i rozumie podstawowe i wybrane zaawansowane narzędzia i techniki uczenia maszynowego.",mp:[]},
+  {id:"W08",code:"W08",cat:"W",text:"Zna i rozumie zasady budowania i analizy sieci złożonych.",mp:[]},
+  {id:"W09",code:"W09",cat:"W",text:"Zna i rozumie problematykę funkcjonowania człowieka w otoczeniu społecznym, teorie wyjaśniające i sposoby prowadzenia badań w psychologii społecznej.",mp:[]},
+  {id:"W10",code:"W10",cat:"W",text:"Zna i rozumie pojęcie emocji i motywacji oraz teorie wyjaśniające w tym zakresie i sposoby badania tych zjawisk.",mp:[]},
+  {id:"W11",code:"W11",cat:"W",text:"Zna i rozumie pojęcie procesów poznawczych oraz teorie wyjaśniające i sposoby badania tych zjawisk.",mp:[]},
+  {id:"W12",code:"W12",cat:"W",text:"Zna i rozumie pojęcia osobowości oraz różnic indywidualnych, ich rolę w wyjaśnianiu zachowań człowieka oraz sposoby ich badania.",mp:[]},
+  {id:"W13",code:"W13",cat:"W",text:"Zna i rozumie zasady stosowania wiedzy psychologicznej do diagnozy potrzeb użytkowników oraz modelowania ich charakterystyki i przewidywania zachowań w celu optymalizacji systemów AI.",mp:[]},
+  {id:"W14",code:"W14",cat:"W",text:"Zna i rozumie fundamentalne dylematy współczesnego świata związane z rozwojem AI, w tym zagrożenia i szanse dla podmiotowości człowieka, prywatności, dobrostanu psychicznego oraz relacji społecznych.",mp:[]},
+  {id:"W15",code:"W15",cat:"W",text:"Zna i rozumie podstawowe uwarunkowania ekonomiczne, prawne i etyczne działalności zawodowej związanej z AI, w tym ochronę własności intelektualnej.",mp:[]},
+  {id:"W16",code:"W16",cat:"W",text:"Zna i rozumie zasady tworzenia i rozwijania różnych form przedsiębiorczości w ramach projektowania i wdrażania systemów AI.",mp:[]},
+  {id:"U01",code:"U01",cat:"U",text:"Potrafi rozwiązywać złożone problemy oraz wykonywać zadania projektowe w warunkach niepewności, integrując wiedzę informatyki technicznej i psychologii.",mp:[]},
+  {id:"U02",code:"U02",cat:"U",text:"Potrafi zaprojektować, zrealizować oraz zweryfikować rozwiązanie oparte na AI, zapewniając poprawność techniczną oraz dopasowanie do potrzeb użytkownika.",mp:[]},
+  {id:"U03",code:"U03",cat:"U",text:"Potrafi wyszukiwać, weryfikować, selekcjonować informacje z informatyki i psychologii oraz analizować i syntetyzować je w sposób krytyczny.",mp:[]},
+  {id:"U04",code:"U04",cat:"U",text:"Potrafi stosować wiedzę z matematyki wyższej, w tym przeprowadzać formalne i poprawne rozumowania.",mp:[]},
+  {id:"U05",code:"U05",cat:"U",text:"Potrafi analizować i rozwiązywać problemy związane z analizą danych.",mp:[]},
+  {id:"U06",code:"U06",cat:"U",text:"Potrafi programować we współczesnych językach programowania.",mp:[]},
+  {id:"U07",code:"U07",cat:"U",text:"Potrafi dbać o bezpieczeństwo danych w obszarze sztucznej inteligencji.",mp:[]},
+  {id:"U08",code:"U08",cat:"U",text:"Potrafi budować sieci złożone, dokonywać ich analizy, prowadzić symulacje i interpretować wyniki.",mp:[]},
+  {id:"U09",code:"U09",cat:"U",text:"Potrafi zaprojektować infrastrukturę niezbędną do uruchomienia systemu AI i uruchomić na niej system.",mp:[]},
+  {id:"U10",code:"U10",cat:"U",text:"Potrafi konstruować oraz analizować zaawansowane algorytmy sztucznej inteligencji.",mp:[]},
+  {id:"U11",code:"U11",cat:"U",text:"Potrafi tworzyć podstawowe modele z zakresu uczenia maszynowego i sztucznej inteligencji.",mp:[]},
+  {id:"U12",code:"U12",cat:"U",text:"Potrafi tworzyć dokumentację techniczną i użytkownika dla opracowanego oprogramowania.",mp:[]},
+  {id:"U13",code:"U13",cat:"U",text:"Potrafi opisywać, uzasadniać i wyjaśniać zachowania człowieka, wykorzystując wiedzę z zakresu psychologii.",mp:[]},
+  {id:"U14",code:"U14",cat:"U",text:"Potrafi wykorzystać teorie psychologiczne do modelowania charakterystyki użytkownika oraz przewidywania jego zachowań w celu optymalizacji systemów AI.",mp:[]},
+  {id:"U15",code:"U15",cat:"U",text:"Potrafi wykorzystać metody badawcze psychologii do diagnozowania potrzeb użytkowników oraz projektowania i ewaluacji systemów AI.",mp:[]},
+  {id:"U16",code:"U16",cat:"U",text:"Potrafi prowadzić komunikację z interesariuszami, posługując się terminologią właściwą dla informatyki technicznej i psychologii.",mp:[]},
+  {id:"U17",code:"U17",cat:"U",text:"Potrafi brać udział w debacie dotyczącej rozwiązań AI, prezentując i oceniając różne stanowiska.",mp:[]},
+  {id:"U18",code:"U18",cat:"U",text:"Potrafi posługiwać się językiem obcym na poziomie B2 ESOKJ.",mp:[]},
+  {id:"U19",code:"U19",cat:"U",text:"Potrafi planować i organizować pracę indywidualną oraz zespołową w grupach interdyscyplinarnych realizujących projekty AI.",mp:[]},
+  {id:"U20",code:"U20",cat:"U",text:"Potrafi planować i realizować rozwój zawodowy i osobisty, wcielając ideę kształcenia ustawicznego.",mp:[]},
+  {id:"K01",code:"K01",cat:"K",text:"Jest gotów do krytycznej oceny posiadanej wiedzy z informatyki i psychologii, będąc świadomym konieczności jej poszerzania i aktualizowania.",mp:[]},
+  {id:"K02",code:"K02",cat:"K",text:"Jest gotów do krytycznej oceny możliwości i ograniczeń AI w obszarach wymagających empatii, etyki oraz rozumienia psychospołecznych uwarunkowań.",mp:[]},
+  {id:"K03",code:"K03",cat:"K",text:"Jest gotów do zasięgania opinii ekspertów przy trudnościach z samodzielnym rozwiązaniem problemu związanego z AI.",mp:[]},
+  {id:"K04",code:"K04",cat:"K",text:"Jest gotów do inicjowania projektów społecznych na rzecz poprawy jakości życia z zastosowaniem nowych technologii.",mp:[]},
+  {id:"K05",code:"K05",cat:"K",text:"Jest gotów do myślenia i działania w sposób przedsiębiorczy, dążąc do tworzenia innowacyjnych rozwiązań AI.",mp:[]},
+  {id:"K06",code:"K06",cat:"K",text:"Jest gotów do brania etycznej odpowiedzialności za projektowane systemy AI, ze szczególnym uwzględnieniem dobrostanu, prywatności i autonomii.",mp:[]},
+  {id:"K07",code:"K07",cat:"K",text:"Jest gotów do odpowiedzialnego pełnienia ról zawodowych, dbając o dorobek i tradycje zawodu inżyniera.",mp:[]},
+  {id:"K08",code:"K08",cat:"K",text:"Ma świadomość ważności systematycznej aktywności fizycznej dla zdrowia fizycznego i psychicznego.",mp:[]}
+];
+
+const INIT_COURSES=[
+{id:"s1-pnt1",name:"Psychologia nowych technologii 1",sem:1,owner:"USWPS",h:60,ct:["Metoda naukowa w badaniu technologii","Cyfrowa demencja; wpływ Sieci na procesy myślowe","Iluzoryczna wielozadaniowość (Turkle); rozproszona uwaga","Lęk przed odrzuceniem; kultura narcyzmu; media społecznościowe a samoocena","Stres informacyjny; brak samokontroli; nadmiar bodźców cyfrowych","Algorytmy w personalizacji nauczania","Różnice międzypokoleniowe w przyswajaniu wiedzy online","Kreowanie marki i zachowania użytkowników w mediach","Agresja elektroniczna i cyberbullying"],at:["LLM jako zewnętrzne rusztowanie poznawcze","Delegowanie zadań poznawczych do AI","Pokolenia cyfrowe vs analogowe w interakcji z generatywną AI","Antropomorfizacja i efekt doliny niesamowitości","Uprzedzenia w AI; algorytmy a ludzkie błędy poznawcze","Projektowanie AI budującego zaufanie użytkownika","Affective computing"]},
+{id:"s1-wps",name:"Wprowadzenie do psychologii społecznej",sem:1,owner:"USWPS",h:60,ct:["Mechanizmy wpływu społecznego, konformizm i autorytet","Poznanie społeczne","Atrybucja społeczna","Grupy i relacje międzygrupowe","Stereotypy i uprzedzenia","Tożsamość społeczna i współzależność","Moralność","Postawy"],at:["Ludzkie uprzedzenia w zbiorach danych i algorytmach","Psychologia polaryzacji napędzanej przez algorytmy","Czy zasady psychologii społecznej działają w kontakcie z AI?"]},
+{id:"s1-pup",name:"Podstawowe umiejętności psychologiczne",sem:1,owner:"USWPS",h:30,ct:[],at:[]},{id:"s1-am",name:"Analiza matematyczna dla informatyków",sem:1,owner:"PWr",h:90,ct:[],at:[]},{id:"s1-alg",name:"Algebra dla informatyków",sem:1,owner:"PWr",h:60,ct:[],at:[]},{id:"s1-prog",name:"Programowanie",sem:1,owner:"PWr",h:75,ct:[],at:[]},{id:"s1-ua",name:"Umiejętności akademickie (onboarding)",sem:1,owner:"inne",h:30,ct:[],at:[]},
+{id:"s2-ps",name:"Psychologia społeczna",sem:2,owner:"USWPS",h:60,ct:["Psychologia międzykulturowa","Prospołeczność i agresja","Atrakcyjność, miłość i bliskie związki","Szczęście"],at:["Nauki o sieciach w kontekście wpływu społecznego","Nowe technologie a relacje i kapitał społeczny","Challenge-based learning"]},
+{id:"s2-pem",name:"Psychologia emocji i motywacji",sem:2,owner:"USWPS",h:60,ct:["Podstawowe koncepcje emocji","Biologiczne, społeczne i poznawcze czynniki wzbudzania emocji","Koncepcje emocji podstawowych; teoria Feldman-Barrett","Złożoność procesów afektywnych","Różnice indywidualne w procesach afektywnych i motywacyjnych","Funkcje emocji i ich związek z poznaniem","Motywacja: teorie socjobiologiczne, behawioralne, poznawcze","Typy motywacji","Mechanizmy motywacyjne; SDT","Teorie celów","Osobowość a motywacja; siła woli; samoregulacja"],at:["Wykrywanie stanów emocjonalnych użytkownika","Modelowanie systemów nagród w AI vs układ dopaminergiczny","Regulacja emocji w interakcji z AI"]},
+{id:"s2-upg",name:"Umiejętność pracy w grupie",sem:2,owner:"USWPS",h:30,ct:[],at:[]},{id:"s2-log",name:"Matematyka dyskretna z elementami logiki",sem:2,owner:"PWr",h:60,ct:[],at:[]},{id:"s2-wai",name:"Wstęp do sztucznej inteligencji",sem:2,owner:"PWr",h:60,ct:[],at:[]},{id:"s2-um",name:"Uczenie maszynowe",sem:2,owner:"PWr",h:60,ct:[],at:[]},{id:"s2-asd",name:"Algorytmy i struktury danych",sem:2,owner:"PWr",h:60,ct:[],at:[]},{id:"s2-wf",name:"Wychowanie fizyczne",sem:2,owner:"PWr",h:30,ct:[],at:[]},
+{id:"s3-met",name:"Metodologia badań psychologicznych z elementami psychometrii",sem:3,owner:"USWPS",h:60,ct:["Teoria naukowa, hipotezy, konceptualizacja, pomiar","Model eksperymentalny i korelacyjny","Projektowanie eksperymentów","Etyka badań psychologicznych","CTT vs IRT","Analiza Czynnikowa (EFA i CFA)","Spójność wewnętrzna; stabilność test-retest","Trafność zbieżna i różnicowa"],at:["Testy psychologiczne do oceny modeli LLM","Zastępowanie ankiet analizą zachowań przy użyciu ML","Prywatność danych psychometrycznych","AI jako narzędzie metodologiczne"]},
+{id:"s3-pp",name:"Psychologia poznawcza",sem:3,owner:"USWPS",h:45,ct:["Spostrzeganie","Uwaga","Pamięć","Pojęcia i kategorie","Myślenie i rozwiązywanie problemów","Sądy, decyzje i heurystyki","Rozumowanie","Psycholingwistyka","Neuronauka poznawcza","Reprezentacja wiedzy","Kreatywność","Świadomość"],at:["Reprezentacja wiedzy w AI","CNN vs ludzki układ wzrokowy","XAI","Wpływ AI na procesy poznawcze","AI jako symulacja procesów poznawczych","Racjonalność: człowiek vs AI","Embodied cognition"]},
+{id:"s3-ug",name:"Uczenie głębokie",sem:3,owner:"PWr",h:60,ct:[],at:[]},{id:"s3-dane",name:"Metody pozyskiwania, przetwarzania i składowania danych",sem:3,owner:"PWr",h:60,ct:[],at:[]},{id:"s3-rps",name:"Rachunek prawdopodobieństwa i statystyka",sem:3,owner:"PWr",h:75,ct:[],at:[]},{id:"s3-wf",name:"Wychowanie fizyczne",sem:3,owner:"PWr",h:30,ct:[],at:[]},{id:"s3-lek",name:"Lektorat",sem:3,owner:"PWr",h:60,ct:[],at:[]},
+{id:"s4-pnt2",name:"Psychologia nowych technologii 2",sem:4,owner:"USWPS",h:60,ct:[],at:[]},
+{id:"s4-por",name:"Psychologia osobowości i różnic indywidualnych",sem:4,owner:"USWPS",h:60,ct:["Psychodynamiczne koncepcje osobowości","Humanistyczne koncepcje","Cechowe teorie (Wielka Piątka)","Poznawcze podejście","Teoria Bandury; Mischel","Koncepcje Ja","Temperament","Inteligencja i zdolności","Inteligencja emocjonalna","Style poznawcze","Twórczość"],at:["Przewidywanie cech osobowości z cyfrowego śladu","Dostosowywanie interfejsów AI do profilu psychologicznego","Projektowanie osobowości asystentów głosowych"]},
+{id:"s4-str1",name:"Szybkie tworzenie rozwiązań AI 1",sem:4,owner:"PWr",h:60,ct:[],at:[]},{id:"s4-hci",name:"Interakcja człowiek–AI i człowiek–komputer",sem:4,owner:"PWr",h:60,ct:[],at:[]},{id:"s4-sz",name:"Sieci złożone",sem:4,owner:"PWr",h:60,ct:[],at:[]},{id:"s4-mmai",name:"Multimodalna Sztuczna Inteligencja",sem:4,owner:"PWr",h:60,ct:[],at:[]},{id:"s4-lek",name:"Lektorat",sem:4,owner:"PWr",h:60,ct:[],at:[]},
+{id:"s5-cyber",name:"Cyberbezpieczeństwo a psychologia",sem:5,owner:"USWPS",h:60,ct:[],at:[]},
+{id:"s5-wops",name:"Wybrane obszary psychologii stosowanej",sem:5,owner:"USWPS",h:60,ct:[],at:["AI w diagnozie zdrowia psychicznego","Rozwiązywanie realnych problemów","Odpowiedzialność społeczna; mentoring"]},
+{id:"s5-etyka",name:"Etyka w zastosowaniu sztucznej inteligencji",sem:5,owner:"USWPS",h:60,ct:["Etyka normatywna","Psychologia moralności; Haidt","Prawo prywatności","Wina i sprawstwo w prawie","Etyka zawodowa psychologa i inżyniera"],at:["Uprzedzenia w danych treningowych","XAI","AI Act","Alignment","Dezinformacja generowana przez AI","Status prawny utworów AI"]},
+{id:"s5-str2",name:"Szybkie tworzenie rozwiązań AI 2",sem:5,owner:"PWr",h:60,ct:[],at:[]},{id:"s5-wdr",name:"Wdrażanie i utrzymanie rozwiązań opartych o AI",sem:5,owner:"PWr",h:60,ct:[],at:[]},{id:"s5-bwh",name:"Blok przedmiotów humanistycznych – USWPS",sem:5,owner:"USWPS",h:60,ct:[],at:[]},{id:"s5-bw1p",name:"Blok przedmiotów wybieralnych 1 – PWr",sem:5,owner:"PWr",h:30,ct:[],at:[]},{id:"s5-ia",name:"Informatyka afektywna",sem:5,owner:"PWr",h:60,ct:[],at:[]},
+{id:"s6-pb1",name:"Projekt badawczy 1",sem:6,owner:"USWPS",h:30,ct:[],at:[]},{id:"s6-uo",name:"Umiejętności osobiste",sem:6,owner:"USWPS",h:30,ct:[],at:[]},{id:"s6-bwp",name:"Bloki przedmiotów wybieralnych – PWr",sem:6,owner:"PWr",h:120,ct:[],at:[]},{id:"s6-zpai1",name:"Zespołowy projekt sztucznej inteligencji 1",sem:6,owner:"PWr",h:30,ct:[],at:[]},{id:"s6-bwus",name:"Bloki przedmiotów wybieralnych – USWPS",sem:6,owner:"USWPS",h:60,ct:[],at:[]},{id:"s6-prakt",name:"Praktyki zawodowe",sem:6,owner:"inne",h:150,ct:[],at:[]},
+{id:"s7-neuro",name:"Neurokognitywistyka w projektowaniu AI",sem:7,owner:"USWPS",h:60,ct:["Anatomia funkcjonalna mózgu","Neurobiologia uczenia się i pamięci","Metody obrazowania mózgu","Specjalizacja półkulowa","Spostrzeganie i rozpoznawanie obiektów","Uwaga i kontrola motoryczna","Pamięć i emocje","Język","Funkcje wykonawcze","Poznanie społeczne (ToM, neurony lustrzane)","Świadomość (Global Workspace Theory)"],at:["Architektury sieci neuronowych inspirowane korą","Interfejsy mózg-komputer","Czy maszyna może mieć umysł?"]},
+{id:"s7-pb2",name:"Projekt badawczy 2",sem:7,owner:"USWPS",h:30,ct:[],at:[]},{id:"s7-zpai2",name:"Zespołowy projekt sztucznej inteligencji 2",sem:7,owner:"PWr",h:90,ct:[],at:[]},{id:"s7-bwus",name:"Blok przedmiotów wybieralnych 4 USWPS",sem:7,owner:"USWPS",h:90,ct:[],at:[]},{id:"s7-bwp",name:"Blok przedmiotów wybieralnych 2 PWr",sem:7,owner:"PWr",h:60,ct:[],at:[]}
+];
+
+const SL={1:"Semestr 1 · zima",2:"Semestr 2 · lato",3:"Semestr 3 · zima",4:"Semestr 4 · lato",5:"Semestr 5 · zima",6:"Semestr 6 · lato",7:"Semestr 7 · zima (10 tyg.)"};
+const OC_MAP={"USWPS":"var(--uswps)","PWr":"var(--pwr)","inne":"var(--other)"};
+const CAT={W:{label:"Wiedza — zna i rozumie",col:"var(--w)"},U:{label:"Umiejętności — potrafi",col:"var(--u)"},K:{label:"Kompetencje społeczne — jest gotów",col:"var(--k)"}};
+
+let db,currentUser=null;
+let S={courses:[],outcomes:[],history:[],openCourse:null,tab:"courses",fs:0,fo:"all"};
+
+// ─── AUTH ────────────────────────────────────────────────────────
+function doLogin(){
+  const provider=new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider).catch(e=>{document.getElementById("loginError").textContent="Błąd logowania: "+e.message});
+}
+function doLogout(){firebase.auth().signOut()}
+
+// ─── INIT ────────────────────────────────────────────────────────
+firebase.initializeApp(FIREBASE_CONFIG);
+db=firebase.database();
+
+// Enable Google Sign-In in Firebase Console → Authentication → Sign-in method → Google → Enable
+firebase.auth().onAuthStateChanged(user=>{
+  if(user){
+    currentUser=user;
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("mainApp").classList.remove("hidden");
+    document.getElementById("userPhoto").src=user.photoURL||"";
+    document.getElementById("userDisplayName").textContent=user.displayName?.split(" ")[0]||user.email;
+    // Listen to DB
+    db.ref("curriculum").on("value",snap=>{
+      const d=snap.val();
+      if(d){S.courses=d.courses||[];S.outcomes=d.outcomes||[];S.history=d.history||[]}
+      render();
+    });
+    db.ref("curriculum").once("value",snap=>{if(!snap.val())db.ref("curriculum").set({courses:INIT_COURSES,outcomes:INIT_OUTCOMES,history:[]})});
+  } else {
+    currentUser=null;
+    document.getElementById("loginScreen").classList.remove("hidden");
+    document.getElementById("mainApp").classList.add("hidden");
+  }
+});
+
+function save(){db.ref("curriculum").set({courses:S.courses,outcomes:S.outcomes,history:S.history})}
+function addHist(w){const who=currentUser?.displayName?.split(" ")[0]||"Anonim";S.history.unshift({who,what:w,when:new Date().toLocaleString("pl-PL")});if(S.history.length>100)S.history.length=100}
+
+// ─── RENDER ──────────────────────────────────────────────────────
+function render(){
+  const wt=S.courses.filter(c=>c.ct.length||c.at.length).length;
+  document.getElementById("statusBar").innerHTML=`<span class="sync-dot"></span>Firebase · ${S.courses.length} przedm. · ${wt} z wątkami · ${S.outcomes.length} efektów`;
+  const tabs=[["courses","📚 Przedmioty"],["outcomes","🎯 Efekty uczenia"],["log","📝 Historia"]];
+  document.getElementById("tabs").innerHTML=tabs.map(([id,l])=>`<button class="tab ${S.tab===id?"on":""}" onclick="S.tab='${id}';render()">${l}</button>`).join("");
+  const el=document.getElementById("content");
+  if(S.tab==="courses")el.innerHTML=rCourses();else if(S.tab==="outcomes")el.innerHTML=rOutcomes();else el.innerHTML=rLog();
+}
+
+function rCourses(){
+  const cs=S.courses.filter(c=>(S.fs===0||c.sem===S.fs)&&(S.fo==="all"||c.owner===S.fo));
+  const sems=[...new Set(cs.map(c=>c.sem))].sort((a,b)=>a-b);
+  let h=`<div class="filters"><button class="fbtn ${S.fs===0?"on":""}" onclick="S.fs=0;render()">Wszystkie</button>`;
+  for(let s=1;s<=7;s++)h+=`<button class="fbtn ${S.fs===s?"on":""}" onclick="S.fs=${s};render()">S${s}</button>`;
+  h+=`<div style="flex:1"></div>`;
+  for(const o of["all","USWPS","PWr"])h+=`<button class="fbtn own ${S.fo===o?"on":""}" onclick="S.fo='${o}';render()">${o==="all"?"Obie":o}</button></div>`;
+  for(const sem of sems){
+    h+=`<div class="sem-label">${SL[sem]}</div>`;
+    for(const c of cs.filter(x=>x.sem===sem)){
+      const isO=S.openCourse===c.id,col=OC_MAP[c.owner]||"var(--other)";
+      h+=`<div class="card ${isO?"open":""}"><div class="card-hdr" onclick="S.openCourse=S.openCourse==='${c.id}'?null:'${c.id}';render()"><div class="card-bar" style="background:${col}"></div><div style="flex:1"><div class="card-title">${esc(c.name)}</div><div class="card-meta"><span class="badge" style="background:${col}22;color:${col}">${c.owner}</span> ${c.h}h · ${c.ct.length} klas. · ${c.at.length} AI</div></div><span class="chevron">▾</span></div>`;
+      if(isO){h+=`<div class="card-body">${secB(c,"ct","classic","Wątki klasyczne","c")}<div style="height:8px"></div>${secB(c,"at","ai","Wątki interdyscyplinarne AI","a")}</div>`}
+      h+=`</div>`;
+    }
+  }
+  h+=`<div class="stats"><span>Z wątkami: <strong style="color:var(--green)">${S.courses.length-S.courses.filter(c=>!c.ct.length&&!c.at.length).length}</strong></span><span>Bez wątków: <strong style="color:var(--red)">${S.courses.filter(c=>!c.ct.length&&!c.at.length).length}</strong></span></div>`;
+  h+=rIO();return h;
+}
+
+function secB(c,key,cls,label,tc){
+  let h=`<div class="sec-hdr"><span class="sec-label ${cls}">${label} (${c[key].length})</span><button class="abtn ${cls}" onclick="toggleAdd('${c.id}','${tc}')">+ Dodaj</button></div>`;
+  h+=`<div id="add-${tc}-${c.id}" style="display:none" class="add-row"><input class="inp" style="flex:1" id="inp-${tc}-${c.id}" placeholder="Nowy wątek…" onkeydown="if(event.key==='Enter')doAdd('${c.id}','${tc}','${key}')"><button class="abtn ${cls}" onclick="doAdd('${c.id}','${tc}','${key}')">OK</button></div>`;
+  if(!c[key].length)h+=`<div class="empty-msg">Brak wątków – kliknij + Dodaj</div>`;
+  const ds=cls==="classic"?"color:var(--tx4)":"color:#6a4a38",ts=cls==="classic"?"color:var(--tx2)":"color:#c09570",dc=cls==="classic"?"•":"◆";
+  c[key].forEach((t,i)=>{h+=`<div class="topic"><span class="dot" style="${ds}">${dc}</span><span class="txt" style="${ts}">${esc(t)}</span><button class="rm" onclick="rmTopic('${c.id}','${key}',${i})">×</button></div>`});
+  return h;
+}
+
+function rOutcomes(){
+  let h='';const wt=S.courses.filter(c=>c.ct.length||c.at.length);
+  for(const[cat,info]of Object.entries(CAT)){
+    const items=S.outcomes.filter(o=>o.cat===cat);if(!items.length)continue;
+    h+=`<div class="cat-header" style="color:${info.col}">${info.label} (${items.length})</div>`;
+    items.forEach(o=>{
+      h+=`<div class="oc-card"><div class="oc-hdr"><span class="oc-code" style="color:${info.col};background:${info.col}15">${esc(o.code)}</span><span class="oc-txt">${esc(o.text)}</span></div><div class="chips">`;
+      wt.forEach(c=>{const m=(o.mp||[]).includes(c.id);const short=c.name.length>20?c.name.substring(0,18)+"…":c.name;
+        h+=`<button class="chip" title="${esc(c.name)}" style="background:${m?info.col+"28":"var(--bg)"};color:${m?info.col:"var(--tx4)"};font-weight:${m?600:400}" onclick="togMap('${o.id}','${c.id}')">${esc(short)}</button>`});
+      h+=`</div></div>`;
+    });
+  }
+  h+=rIO();return h;
+}
+
+function rLog(){
+  let h=`<div style="font-size:13px;color:var(--tx3);margin-bottom:10px">Historia zmian (synchronizowana w czasie rzeczywistym)</div>`;
+  if(!S.history.length)h+=`<div style="text-align:center;padding:30px;color:var(--tx4)">Brak zmian</div>`;
+  S.history.forEach(e=>{h+=`<div class="log-row"><span class="log-who">${esc(e.who)}</span><span class="log-what">${esc(e.what)}</span><span class="log-when">${esc(e.when)}</span></div>`});
+  h+=rIO();return h;
+}
+
+function rIO(){return`<div class="io-bar"><button class="io-btn" onclick="doExport()">📥 Eksportuj JSON</button><button class="io-btn" onclick="document.getElementById('impF').click()">📤 Importuj JSON</button><input type="file" id="impF" class="hidden" accept=".json" onchange="doImport(event)"><div style="flex:1"></div><button class="io-btn danger" onclick="doReset()">🗑 Reset</button></div>`}
+
+// ─── ACTIONS ─────────────────────────────────────────────────────
+function toggleAdd(cid,t){const el=document.getElementById(`add-${t}-${cid}`);if(el){el.style.display=el.style.display==="none"?"flex":"none";if(el.style.display==="flex")el.querySelector("input").focus()}}
+function doAdd(cid,t,key){const inp=document.getElementById(`inp-${t}-${cid}`);if(!inp||!inp.value.trim())return;const c=S.courses.find(x=>x.id===cid);if(!c)return;if(!c[key])c[key]=[];c[key].push(inp.value.trim());addHist(`+ ${key==="ct"?"klas.":"AI"} → „${c.name.substring(0,25)}…"`);save()}
+function rmTopic(cid,key,idx){const c=S.courses.find(x=>x.id===cid);if(!c)return;c[key].splice(idx,1);addHist(`− wątek z „${c.name.substring(0,25)}…"`);save()}
+function togMap(oid,cid){const o=S.outcomes.find(x=>x.id===oid);if(!o)return;if(!o.mp)o.mp=[];const i=o.mp.indexOf(cid);if(i>=0)o.mp.splice(i,1);else o.mp.push(cid);save()}
+function doExport(){const d=JSON.stringify({courses:S.courses,outcomes:S.outcomes,history:S.history},null,2);const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([d],{type:"application/json"}));a.download=`curriculum-${new Date().toISOString().slice(0,10)}.json`;a.click()}
+function doImport(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(d.courses)S.courses=d.courses;if(d.outcomes)S.outcomes=d.outcomes;if(d.history)S.history=d.history;addHist("Import z pliku");save();alert("Zaimportowano!")}catch(err){alert("Błąd: "+err.message)}};r.readAsText(f);ev.target.value=""}
+function doReset(){if(!confirm("Przywrócić dane początkowe?"))return;S.courses=JSON.parse(JSON.stringify(INIT_COURSES));S.outcomes=JSON.parse(JSON.stringify(INIT_OUTCOMES));addHist("RESET");save()}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+</script>
+</body>
+</html>
