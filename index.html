@@ -293,12 +293,17 @@ function render(){
   const tabs=[["courses","📚 Przedmioty"],["outcomes","🎯 Efekty"],["matrix","📊 Matryca"],["links","🔗 Powiązania"],["users","👥 Użytkownicy"],["log","📝 Historia"]];
   document.getElementById("tabs").innerHTML=tabs.map(([id,l])=>`<button class="tab ${S.tab===id?"on":""}" onclick="S.tab='${id}';render()">${l}</button>`).join("");
   const el=document.getElementById("content");
-  if(S.tab==="courses")el.innerHTML=rCourses();
-  else if(S.tab==="outcomes")el.innerHTML=rOutcomes();
-  else if(S.tab==="matrix")el.innerHTML=rMatrix();
-  else if(S.tab==="links")el.innerHTML=rLinks();
-  else if(S.tab==="users")el.innerHTML=rUsers();
-  else el.innerHTML=rLog();
+  try {
+    if(S.tab==="courses")el.innerHTML=rCourses();
+    else if(S.tab==="outcomes")el.innerHTML=rOutcomes();
+    else if(S.tab==="matrix")el.innerHTML=rMatrix();
+    else if(S.tab==="links")el.innerHTML=rLinks();
+    else if(S.tab==="users")el.innerHTML=rUsers();
+    else el.innerHTML=rLog();
+  } catch(err) {
+    console.error("Render error:",err);
+    el.innerHTML=`<div style="padding:20px;color:var(--red);font-family:monospace;font-size:12px;white-space:pre-wrap">Błąd renderowania zakładki „${S.tab}":\n\n${err.message}\n\n${err.stack||""}</div>`;
+  }
   // Auto-focus edit inputs
   if(S.editTopic){const ef=document.querySelector(`[id^="editT-"]`);if(ef){ef.focus();ef.selectionStart=ef.value.length}}
 }
@@ -470,6 +475,119 @@ function rMatrix(){
   return h;
 }
 
+function rLinks(){
+  const LABELS=["brak","◆ uzupełniające","◆◆ istotne","◆◆◆ fundamentalne"];
+  const ALPHA=["transparent","rgba(232,133,79,.22)","rgba(232,133,79,.5)","rgba(232,133,79,.85)"];
+  const from=S.linkFrom||"USWPS";
+  const to=from==="USWPS"?"PWr":"USWPS";
+  const rows=(S.courses||[]).filter(c=>c&&c.owner===from).sort((a,b)=>(a.sem||0)-(b.sem||0));
+  const cols=(S.courses||[]).filter(c=>c&&c.owner===to).sort((a,b)=>(a.sem||0)-(b.sem||0));
+  const links=S.links||{};
+
+  let h=`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px">`;
+  h+=`<div style="font-size:15px;font-weight:600;color:var(--txH)">Macierz powiązań między przedmiotami</div>`;
+  h+=`<div style="flex:1"></div>`;
+  h+=`<button class="fbtn ${from==="USWPS"?"on":""}" onclick="S.linkFrom='USWPS';S.linkCell=null;render()">USWPS → PWr</button>`;
+  h+=`<button class="fbtn ${from==="PWr"?"on":""}" onclick="S.linkFrom='PWr';S.linkCell=null;render()">PWr → USWPS</button>`;
+  h+=`</div>`;
+  h+=`<div style="font-size:12.5px;color:var(--tx3);margin-bottom:14px;line-height:1.6">Wiersze: <strong style="color:${from==="USWPS"?"var(--uswps)":"var(--pwr)"}">${esc(from)}</strong> · Kolumny: <strong style="color:${to==="USWPS"?"var(--uswps)":"var(--pwr)"}">${esc(to)}</strong>. Kliknij komórkę aby zobaczyć/edytować szczegóły. Intensywność koloru = siła powiązania.</div>`;
+
+  h+=`<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--tx3);margin-bottom:12px">`;
+  for(let i=0;i<4;i++)h+=`<span style="display:inline-flex;align-items:center;gap:5px"><i style="width:14px;height:14px;border-radius:3px;border:1px solid var(--bdr);background:${ALPHA[i]};display:block"></i>${LABELS[i]}</span>`;
+  h+=`</div>`;
+
+  if(!rows.length||!cols.length){h+=`<div style="padding:20px;color:var(--tx3)">Brak przedmiotów w kategorii ${esc(from)} lub ${esc(to)} do wyświetlenia.</div>`;return h}
+
+  // Mobile: stack panel below matrix
+  const isNarrow=window.innerWidth<900;
+  h+=`<div style="display:grid;grid-template-columns:${isNarrow?"1fr":"1fr 380px"};gap:14px;align-items:start">`;
+
+  // Matrix
+  h+=`<div style="overflow:auto;border:1px solid var(--bdr);border-radius:var(--radius);background:var(--bg2);padding:10px"><table style="border-collapse:separate;border-spacing:2px;min-width:max-content">`;
+  h+=`<thead><tr><th style="width:0"></th>`;
+  cols.forEach(c=>{
+    const col=c.owner==="USWPS"?"var(--uswps)":c.owner==="PWr"?"var(--pwr)":"var(--other)";
+    const nm=c.name||"(bez nazwy)";
+    h+=`<th style="writing-mode:vertical-rl;transform:rotate(180deg);height:200px;max-width:28px;min-width:28px;color:${col};font-size:10.5px;font-weight:600;text-align:left;white-space:nowrap;padding:4px 2px" title="${esc(nm)} (sem. ${c.sem||"?"})">S${c.sem||"?"} ${esc(nm.substring(0,26))}${nm.length>26?"…":""}</th>`;
+  });
+  h+=`</tr></thead><tbody>`;
+  rows.forEach(r=>{
+    const rowCol=r.owner==="USWPS"?"var(--uswps)":r.owner==="PWr"?"var(--pwr)":"var(--other)";
+    const rnm=r.name||"(bez nazwy)";
+    h+=`<tr><th style="color:var(--tx);font-size:12.5px;font-weight:500;text-align:right;padding:0 10px 0 4px;white-space:nowrap;max-width:280px;overflow:hidden;text-overflow:ellipsis" title="${esc(rnm)}"><span style="color:${rowCol};font-weight:600">S${r.sem||"?"}</span> ${esc(rnm)}</th>`;
+    cols.forEach(c=>{
+      const k=r.id+"|"+c.id;
+      const link=links[k]||{};
+      const s=(link&&typeof link==="object"&&typeof link.s==="number")?link.s:0;
+      const isActive=S.linkCell===k;
+      h+=`<td onclick="S.linkCell='${k}';S.editLinkCard=null;render()" style="width:26px;height:26px;min-width:26px;border-radius:4px;border:1px solid ${isActive?"var(--acc)":"var(--bdr)"};cursor:pointer;background:${ALPHA[s]||ALPHA[0]};${isActive?"box-shadow:0 0 0 2px var(--acc);position:relative;z-index:2":""}" title="${esc(rnm)} → ${esc(c.name||"")} | ${LABELS[s]||LABELS[0]}"></td>`;
+    });
+    h+=`</tr>`;
+  });
+  h+=`</tbody></table></div>`;
+
+  // Side panel
+  h+=`<div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius);padding:14px;min-height:280px">`;
+  if(!S.linkCell){
+    h+=`<div style="color:var(--tx3);font-size:13px;line-height:1.6">Kliknij komórkę w macierzy, aby zobaczyć i edytować szczegóły powiązania — siłę oraz karty opisujące, jak jeden przedmiot informuje drugi (koncept, argument, przykład, źródło).</div>`;
+  } else {
+    const parts=S.linkCell.split("|");
+    const r=S.courses.find(x=>x.id===parts[0]),c=S.courses.find(x=>x.id===parts[1]);
+    if(!r||!c){h+=`<div style="color:var(--tx3)">Przedmiot został usunięty.</div></div></div>`;return h}
+    const link=links[S.linkCell]||{};
+    const linkS=(typeof link.s==="number")?link.s:0;
+    const linkCards=toArr(link.cards);
+    const rowCol=r.owner==="USWPS"?"var(--uswps)":"var(--pwr)";
+    const colCol=c.owner==="USWPS"?"var(--uswps)":"var(--pwr)";
+
+    h+=`<div style="font-size:10.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Powiązanie</div>`;
+    h+=`<div style="font-size:14.5px;font-weight:600;color:${rowCol};margin-bottom:3px;line-height:1.35">${esc(r.name)}</div>`;
+    h+=`<div style="font-size:13px;color:var(--tx2);margin-bottom:4px">→ <span style="color:${colCol};font-weight:600">${esc(c.name)}</span></div>`;
+    h+=`<div style="font-size:10.5px;color:var(--tx3);margin-bottom:14px">sem. ${r.sem} · ${esc(r.owner)} &nbsp;|&nbsp; sem. ${c.sem} · ${esc(c.owner)}</div>`;
+
+    h+=`<div style="font-size:10.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Siła powiązania</div>`;
+    h+=`<div style="display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap">`;
+    for(let i=0;i<4;i++){
+      const on=linkS===i;
+      h+=`<button onclick="setLinkStrength('${S.linkCell}',${i})" style="padding:6px 11px;border:1px solid ${on?"var(--acc)":"var(--bdr2)"};border-radius:6px;background:${on?(ALPHA[i]||"var(--bg3)"):"var(--bg)"};color:${on?"var(--txH)":"var(--tx2)"};font-size:11px;font-weight:${on?600:400};cursor:pointer">${LABELS[i]}</button>`;
+    }
+    h+=`</div>`;
+
+    h+=`<div style="font-size:10.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Karty merytoryczne (${linkCards.length})</div>`;
+    linkCards.forEach((card,idx)=>{
+      const isEd=S.editLinkCard===S.linkCell+"-"+idx;
+      h+=`<div style="border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--bg3)">`;
+      if(isEd){
+        h+=`<input class="inp" style="margin-bottom:6px;font-weight:600" placeholder="Koncept / tytuł" value="${esc(card.c||"")}" id="lc-c">`;
+        h+=`<textarea class="inp" style="margin-bottom:6px;min-height:70px;resize:vertical" placeholder="Argument — dlaczego to powiązanie istnieje" id="lc-a">${esc(card.a||"")}</textarea>`;
+        h+=`<textarea class="inp" style="margin-bottom:6px;min-height:50px;resize:vertical" placeholder="Przykład konkretny (opcjonalnie)" id="lc-e">${esc(card.e||"")}</textarea>`;
+        h+=`<input class="inp" style="margin-bottom:8px" placeholder="Źródło / literatura (opcjonalnie)" value="${esc(card.p||"")}" id="lc-p">`;
+        h+=`<div style="display:flex;gap:5px;flex-wrap:wrap"><button class="abtn ai" onclick="saveLinkCard('${S.linkCell}',${idx})">✓ Zapisz</button><button class="abtn edit" onclick="S.editLinkCard=null;render()">✕ Anuluj</button><button class="abtn del" onclick="delLinkCard('${S.linkCell}',${idx})">🗑 Usuń</button></div>`;
+      } else {
+        h+=`<div style="font-weight:600;font-size:12.5px;color:var(--acc);margin-bottom:6px;line-height:1.4">${esc(card.c||"(bez tytułu)")}</div>`;
+        if(card.a)h+=`<div style="font-size:12.5px;line-height:1.55;color:var(--tx);margin-bottom:5px">${esc(card.a)}</div>`;
+        if(card.e)h+=`<div style="font-size:11.5px;color:var(--tx2);line-height:1.5;border-left:2px solid var(--acc);padding-left:10px;margin-top:6px">${esc(card.e)}</div>`;
+        if(card.p)h+=`<div style="font-size:11px;color:var(--tx3);margin-top:7px;font-style:italic">📄 ${esc(card.p)}</div>`;
+        h+=`<div style="margin-top:7px"><button class="abtn edit" style="font-size:10px;padding:3px 9px" onclick="S.editLinkCard='${S.linkCell}-${idx}';render()">✏️ Edytuj</button></div>`;
+      }
+      h+=`</div>`;
+    });
+    h+=`<button class="abtn ai" style="margin-top:4px" onclick="addLinkCard('${S.linkCell}')">+ Nowa karta</button>`;
+  }
+  h+=`</div></div>`;
+
+  // Stats
+  const allLinks=Object.values(links).filter(l=>l&&typeof l==="object");
+  const s3=allLinks.filter(l=>l.s===3).length;
+  const s2=allLinks.filter(l=>l.s===2).length;
+  const s1=allLinks.filter(l=>l.s===1).length;
+  const total=rows.length*cols.length;
+  const filled=allLinks.filter(l=>(l.s||0)>0).length;
+  h+=`<div class="stats" style="margin-top:14px"><span>◆◆◆ fundamentalne: <strong>${s3}</strong></span><span>◆◆ istotne: <strong>${s2}</strong></span><span>◆ uzupełniające: <strong>${s1}</strong></span><span>Pokrycie: <strong>${filled}/${total}</strong> (${total?Math.round(filled/total*100):0}%)</span></div>`;
+
+  return h;
+}
+
 function rUsers(){
   const users=Object.values(presenceUsers);
   let h=`<div style="font-size:15px;font-weight:600;color:var(--txH);margin-bottom:14px">👥 Aktualnie zalogowani (${users.length})</div>`;
@@ -508,8 +626,12 @@ function delCourse(cid){const c=S.courses.find(x=>x.id===cid);if(!c||!confirm(`U
 function updOc(oid,field,val){const o=S.outcomes.find(x=>x.id===oid);if(!o)return;o[field]=val;if(field!=="notes")addH(`Edycja efektu ${o.code}: ${field}`);save()}
 function delOc(oid){const o=S.outcomes.find(x=>x.id===oid);if(!o||!confirm(`Usunąć efekt ${o.code}?`))return;S.outcomes=S.outcomes.filter(x=>x.id!==oid);addH(`🗑 Usunięto efekt ${o.code}`);save()}
 function togMap(oid,cid){const o=S.outcomes.find(x=>x.id===oid);if(!o)return;if(!o.mp)o.mp=[];const i=o.mp.indexOf(cid);if(i>=0)o.mp.splice(i,1);else o.mp.push(cid);save()}
-function doExport(){const d=JSON.stringify({courses:S.courses,outcomes:S.outcomes,history:S.history},null,2);const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([d],{type:"application/json"}));a.download=`curriculum-${new Date().toISOString().slice(0,10)}.json`;a.click()}
-function doImport(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(d.courses)S.courses=d.courses;if(d.outcomes)S.outcomes=d.outcomes;if(d.history)S.history=d.history;addH("Import z pliku");save();alert("Zaimportowano!")}catch(err){alert("Błąd: "+err.message)}};r.readAsText(f);ev.target.value=""}
+function setLinkStrength(key,s){if(!S.links)S.links={};if(!S.links[key])S.links[key]={s:0,cards:[]};const old=S.links[key].s||0;S.links[key].s=s;const[rId,cId]=key.split("|");const r=S.courses.find(x=>x.id===rId),c=S.courses.find(x=>x.id===cId);if(old!==s&&r&&c)addH(`🔗 Siła ${old}→${s}: „${r.name.substring(0,20)}"→„${c.name.substring(0,20)}"`);save()}
+function addLinkCard(key){if(!S.links)S.links={};if(!S.links[key])S.links[key]={s:1,cards:[]};if(!S.links[key].cards)S.links[key].cards=[];S.links[key].cards.push({c:"",a:"",e:"",p:""});S.editLinkCard=key+"-"+(S.links[key].cards.length-1);render()}
+function saveLinkCard(key,idx){const c=document.getElementById("lc-c")?.value.trim()||"";const a=document.getElementById("lc-a")?.value.trim()||"";const e=document.getElementById("lc-e")?.value.trim()||"";const p=document.getElementById("lc-p")?.value.trim()||"";if(!S.links[key])S.links[key]={s:0,cards:[]};if(!S.links[key].cards)S.links[key].cards=[];S.links[key].cards[idx]={c,a,e,p};S.editLinkCard=null;const[rId,cId]=key.split("|");const rC=S.courses.find(x=>x.id===rId),cC=S.courses.find(x=>x.id===cId);if(rC&&cC)addH(`🔗 Karta „${c.substring(0,30)}" → „${rC.name.substring(0,18)}↔${cC.name.substring(0,18)}"`);save()}
+function delLinkCard(key,idx){if(!confirm("Usunąć tę kartę?"))return;if(!S.links[key]||!S.links[key].cards)return;S.links[key].cards.splice(idx,1);S.editLinkCard=null;addH("🗑 Usunięto kartę powiązania");save()}
+function doExport(){const d=JSON.stringify({courses:S.courses,outcomes:S.outcomes,history:S.history,links:S.links||{}},null,2);const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([d],{type:"application/json"}));a.download=`curriculum-${new Date().toISOString().slice(0,10)}.json`;a.click()}
+function doImport(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(d.courses)S.courses=d.courses;if(d.outcomes)S.outcomes=d.outcomes;if(d.history)S.history=d.history;if(d.links)S.links=d.links;addH("Import z pliku");save();alert("Zaimportowano!")}catch(err){alert("Błąd: "+err.message)}};r.readAsText(f);ev.target.value=""}
 function doReset(){if(!confirm("Przywrócić dane początkowe? Wszystkie zmiany zostaną utracone."))return;S.courses=JSON.parse(JSON.stringify(INIT_COURSES));S.outcomes=JSON.parse(JSON.stringify(INIT_OUTCOMES));addH("RESET");save()}
 </script>
 </body>
