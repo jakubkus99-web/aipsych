@@ -237,7 +237,7 @@ const OC_MAP={"USWPS":"var(--uswps)","PWr":"var(--pwr)","inne":"var(--other)"};
 const CAT={W:{label:"Wiedza — zna i rozumie",col:"var(--w)"},U:{label:"Umiejętności — potrafi",col:"var(--u)"},K:{label:"Kompetencje społeczne — jest gotów",col:"var(--k)"}};
 
 let db,currentUser=null,presenceRef=null;
-let S={courses:[],outcomes:[],history:[],openCourse:null,tab:"courses",fs:0,fo:"all",editCourse:null,editOc:null,editTopic:null};
+let S={courses:[],outcomes:[],history:[],links:{},openCourse:null,tab:"courses",fs:0,fo:"all",editCourse:null,editOc:null,editTopic:null,linkCell:null,editLinkCard:null,linkFrom:"USWPS"};
 let presenceUsers={};
 
 // ─── HELPERS ─────────────────────────────────────────────────────
@@ -272,7 +272,7 @@ firebase.auth().onAuthStateChanged(user=>{
     // Data
     db.ref("curriculum").on("value",snap=>{
       const d=snap.val();
-      if(d){S.courses=fixC(d.courses);S.outcomes=fixO(d.outcomes);S.history=toArr(d.history)}
+      if(d){S.courses=fixC(d.courses);S.outcomes=fixO(d.outcomes);S.history=toArr(d.history);S.links=d.links||{}}
       render();
     });
     db.ref("curriculum").once("value",snap=>{if(!snap.val())db.ref("curriculum").set({courses:INIT_COURSES,outcomes:INIT_OUTCOMES,history:[]})});
@@ -283,19 +283,20 @@ firebase.auth().onAuthStateChanged(user=>{
   }
 });
 
-function save(){db.ref("curriculum").set({courses:S.courses,outcomes:S.outcomes,history:S.history})}
+function save(){db.ref("curriculum").set({courses:S.courses,outcomes:S.outcomes,history:S.history,links:S.links||{}})}
 function addH(w){S.history.unshift({who:who(),what:w,when:new Date().toLocaleString("pl-PL")});if(S.history.length>200)S.history.length=200}
 
 // ─── RENDER ──────────────────────────────────────────────────────
 function render(){
   const wt=S.courses.filter(c=>(c.ct||[]).length||(c.at||[]).length).length;
   document.getElementById("statusBar").innerHTML=`<span class="sync-dot"></span>Firebase · ${S.courses.length} przedm. · ${wt} z wątkami · ${S.outcomes.length} efektów`;
-  const tabs=[["courses","📚 Przedmioty"],["outcomes","🎯 Efekty uczenia"],["matrix","📊 Matryca"],["users","👥 Użytkownicy"],["log","📝 Historia"]];
+  const tabs=[["courses","📚 Przedmioty"],["outcomes","🎯 Efekty"],["matrix","📊 Matryca"],["links","🔗 Powiązania"],["users","👥 Użytkownicy"],["log","📝 Historia"]];
   document.getElementById("tabs").innerHTML=tabs.map(([id,l])=>`<button class="tab ${S.tab===id?"on":""}" onclick="S.tab='${id}';render()">${l}</button>`).join("");
   const el=document.getElementById("content");
   if(S.tab==="courses")el.innerHTML=rCourses();
   else if(S.tab==="outcomes")el.innerHTML=rOutcomes();
   else if(S.tab==="matrix")el.innerHTML=rMatrix();
+  else if(S.tab==="links")el.innerHTML=rLinks();
   else if(S.tab==="users")el.innerHTML=rUsers();
   else el.innerHTML=rLog();
   // Auto-focus edit inputs
